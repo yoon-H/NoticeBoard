@@ -1,0 +1,26 @@
+CREATE TABLE IF NOT EXISTS users
+(
+    id              INT AUTO_INCREMENT PRIMARY KEY,
+    name            VARCHAR(255) UNIQUE,
+    login_id        VARCHAR(255) UNIQUE,
+    password        VARCHAR(255),
+    create_dt       TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS posts
+(
+    id              INT AUTO_INCREMENT PRIMARY KEY,
+    title           VARCHAR(255),
+    author          VARCHAR(255) FOREIGN KEY REFERENCES users(id) ON UPDATE CASCADE ON DELETE SET NULL,
+    content         VARCHAR(255),
+    create_dt       TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS comments
+(
+    id              INT AUTO_INCREMENT PRIMARY KEY,
+    author          VARCHAR(255) FOREIGN KEY REFERENCES users(id) ON UPDATE CASCADE ON DELETE SET NULL,
+    content         VARCHAR(255),
+    post_id         INT FOREIGN KEY REFERENCES posts(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    create_dt       TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
