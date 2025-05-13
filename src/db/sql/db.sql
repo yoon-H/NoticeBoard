@@ -1,3 +1,5 @@
+USE POST_DB
+
 CREATE TABLE IF NOT EXISTS users
 (
     id              INT AUTO_INCREMENT PRIMARY KEY,
@@ -11,8 +13,8 @@ CREATE TABLE IF NOT EXISTS posts
 (
     id              INT AUTO_INCREMENT PRIMARY KEY,
     title           VARCHAR(255),
-    author          VARCHAR(255),
-    content         VARCHAR(255),
+    author          INT,
+    content         TEXT,
     create_dt       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (author) REFERENCES users(id) ON UPDATE CASCADE ON DELETE SET NULL
 );
@@ -20,8 +22,8 @@ CREATE TABLE IF NOT EXISTS posts
 CREATE TABLE IF NOT EXISTS comments
 (
     id              INT AUTO_INCREMENT PRIMARY KEY,
-    author          VARCHAR(255),
-    content         VARCHAR(255),
+    author          INT,
+    content         TEXT,
     post_id         INT,
     create_dt       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (author) REFERENCES users(id) ON UPDATE CASCADE ON DELETE SET NULL,
