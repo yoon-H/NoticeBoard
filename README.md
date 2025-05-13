@@ -1,8 +1,8 @@
 # NoticeBoard
 
 # 커밋 컨벤션
-- 접두사(1개만) + 콜론 + 한칸 띄우고 + 내용적기
-- ex) add: monsterHandler 생성
+- 접두사(1개만) + 한칸 띄우고 + 콜론 + 한칸 띄우고 + 내용적기
+- ex) add : monsterHandler 생성
 
   
 |작업타입|작업내용|
