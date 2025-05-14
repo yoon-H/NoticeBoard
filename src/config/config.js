@@ -1,3 +1,4 @@
+import { ID_REG, NAME_REG, PW_REG } from "../validation/auth.validation.js";
 import {
   DB_HOST,
   DB_NAME,
@@ -19,5 +20,10 @@ export const config = {
     password: DB_PASSWORD,
     host: DB_HOST,
     port: DB_PORT,
+  },
+  reg: {
+    id_reg: ID_REG,
+    pw_reg: PW_REG,
+    name_reg: NAME_REG,
   },
 };
