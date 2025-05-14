@@ -5,7 +5,7 @@ const SQL_POST_QUERIES = {
   GET_POST:
     "SELECT p.id AS id, p.title AS title, u.name AS name, p.content AS content, p.create_dt AS time, password FROM posts AS p LEFT JOIN users AS u ON p.author = u.id WHERE p.id = ?;",
   EDIT_POST: "UPDATE posts SET title = ?, content = ? WHERE id = ?",
-  DELET_POST: "DELETE FROM posts WHERE id = ?",
+  DELETE_POST: "DELETE FROM posts WHERE id = ?",
 };
 
 export default SQL_POST_QUERIES;
