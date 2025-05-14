@@ -1,7 +1,9 @@
 import express from 'express';
+import { config } from './config/config.js';
 
 const app = express();
-const PORT = 3000;
+const HOST = config.server.host;
+const PORT = config.server.port;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -10,6 +12,6 @@ app.use('/api', [
     
 ]);
 
-app.listen(PORT, () => {
-  console.log(PORT, '서버가 열렸습니다.');
+app.listen(HOST, PORT, () => {
+  console.log(HOST, PORT, '서버가 열렸습니다.');
 });
