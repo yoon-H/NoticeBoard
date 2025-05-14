@@ -1,5 +1,6 @@
-import express from 'express';
-import { config } from './config/config.js';
+import express from "express";
+import { config } from "./config/config.js";
+import authRoutes from "./routes/auth.routes.js";
 
 const app = express();
 const HOST = config.server.host;
@@ -8,10 +9,8 @@ const PORT = config.server.port;
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.use('/api', [
-    
-]);
+app.use("/api", [authRoutes]);
 
 app.listen(HOST, PORT, () => {
-  console.log(HOST, PORT, '서버가 열렸습니다.');
+  console.log(HOST, PORT, "서버가 열렸습니다.");
 });
