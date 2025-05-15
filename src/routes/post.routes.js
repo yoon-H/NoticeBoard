@@ -48,3 +48,5 @@ router.delete("/posts/:postId", async (req, res) => {
 
   return res.status(200).json({ message: "게시글이 수정되었습니다." });
 });
+
+export default router;
