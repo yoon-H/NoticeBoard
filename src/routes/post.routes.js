@@ -49,12 +49,12 @@ router.get("/posts/:postId", async (req, res, next) => {
 router.put("/posts/:postId", async (req, res, next) => {
   try {
     const postId = req.params.postId;
-    const { title, content, id } = req.body; // id는 user_id
+    const { title, content, author } = req.body;
 
-    if (!title || !id || !content)
+    if (!title || !author || !content)
       return res.status(400).json({ message: "요소를 전부 입력해주세요." });
 
-    await editPost(title, content, postId, id);
+    await editPost(title, content, postId, author);
 
     return res.status(200).json({ message: "게시글이 수정되었습니다." });
   } catch (err) {
@@ -65,12 +65,12 @@ router.put("/posts/:postId", async (req, res, next) => {
 router.delete("/posts/:postId", async (req, res, next) => {
   try {
     const postId = req.params.postId;
-    const { id } = req.body; // id는 user_id
+    const { author } = req.body;
 
-    if (!id)
+    if (!author)
       return res.status(400).json({ message: "요소를 전부 입력해주세요." });
 
-    await deletePost(postId, id);
+    await deletePost(postId, author);
 
     return res.status(200).json({ message: "게시글이 수정되었습니다." });
   } catch (err) {

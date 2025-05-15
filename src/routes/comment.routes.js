@@ -25,6 +25,9 @@ router.post("/posts/:postId/comments", async (req, res, next) => {
     const postId = req.params.postId;
     const { author, content } = req.body;
 
+    if (!author || !content)
+      return res.status(400).json({ message: "모든 요소를 작성해주세요." });
+
     await createComment(author, content, postId);
 
     return res.status(201).json({ message: "댓글이 저장되었습니다." });
@@ -38,7 +41,10 @@ router.put("/comments/:commentId", async (req, res, next) => {
     const commentId = req.params.commentId;
     const { content, author } = req.body;
 
-    await editComment(content, commentId, author);
+    if (!author || !content)
+      return res.status(400).json({ message: "모든 요소를 작성해주세요." });
+
+    await editComment(commentId, content, author);
 
     return res.status(200).json({ message: "댓글이 수정되었습니다." });
   } catch (err) {
@@ -50,6 +56,9 @@ router.delete("/comments/:commentId", async (req, res, next) => {
   try {
     const commentId = req.params.commentId;
     const { author } = req.body;
+
+    if (!author)
+      return res.status(400).json({ message: "모든 요소를 작성해주세요." });
 
     await deleteComment(commentId, author);
 
