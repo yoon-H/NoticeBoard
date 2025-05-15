@@ -10,6 +10,9 @@ router.post("/auth/signup", async (req, res, next) => {
   try {
     const { id, password, confirmPassword, name } = req.body;
 
+    if (!id || !password || !confirmPassword || !name)
+      return res.status(400).json({ message: "요소를 전부 적어주세요." });
+
     // 유효성 검사
     if (!config.reg.id_reg.test(id))
       return res.status(400).json({ message: "아이디가 적합하지 않습니다." });
@@ -38,6 +41,9 @@ router.post("/auth/login", async (req, res, next) => {
   try {
     const { id, password } = req.body;
 
+    if (!id || !password)
+      return res.status(400).json({ message: "요소를 전부 적어주세요." });
+
     // 가입된 사용자 확인
     const user = await findUserByLoginId(id);
 
@@ -46,7 +52,7 @@ router.post("/auth/login", async (req, res, next) => {
         .status(400)
         .json({ message: "유저 정보가 존재하지 않습니다." });
 
-    if (!bcrypt.compare(password, user.password))
+    if (!(await bcrypt.compare(password, user.password)))
       return res.status(400).json({ message: "비밀번호가 일치하지 않습니다." });
 
     return res.status(200).json({ message: "로그인이 완료되었습니다." });

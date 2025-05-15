@@ -6,5 +6,7 @@ export const createUser = async (name, id, password) => {
 };
 
 export const findUserByLoginId = async (id) => {
-  await pool.query(SQL_USER_QUERIES.FIND_USER_BY_LOGIN_ID, [id]);
+  const [row] = await pool.query(SQL_USER_QUERIES.FIND_USER_BY_LOGIN_ID, [id]);
+
+  return row[0];
 };
