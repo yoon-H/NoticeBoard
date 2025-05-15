@@ -15,6 +15,15 @@ const createPool = (db) => {
     queueLimit: 0,
   });
 
+  const originQuery = pool.query;
+
+  pool.query = (sql, params) => {
+    console.log(
+      `Executing query: ${sql} ${params ? `, ${JSON.stringify(params)}` : ``}`
+    );
+    return originQuery.call(pool, sql, params);
+  };
+
   return pool;
 };
 
