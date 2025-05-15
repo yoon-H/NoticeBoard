@@ -2,9 +2,9 @@ import pool from "../../database.js";
 import SQL_POST_QUERIES from "./post.queries.js";
 
 export const getAllPosts = async () => {
-  const posts = await pool.query(SQL_POST_QUERIES.GET_ALL_POSTS);
+  const [row] = await pool.query(SQL_POST_QUERIES.GET_ALL_POSTS);
 
-  return posts;
+  return row;
 };
 
 export const createPost = async (title, author, content) => {
@@ -12,9 +12,9 @@ export const createPost = async (title, author, content) => {
 };
 
 export const getPost = async (id) => {
-  const post = await pool.query(SQL_POST_QUERIES.GET_POST, [id]);
+  const [row] = await pool.query(SQL_POST_QUERIES.GET_POST, [id]);
 
-  return post;
+  return row[0];
 };
 
 export const editPost = async (title, content, id, author) => {
