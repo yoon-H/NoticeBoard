@@ -17,10 +17,10 @@ export const getPost = async (id) => {
   return post;
 };
 
-export const editPost = async (title, content, id) => {
-  await pool.query(SQL_POST_QUERIES.EDIT_POST, [title, content, id]);
+export const editPost = async (title, content, id, author) => {
+  await pool.query(SQL_POST_QUERIES.EDIT_POST, [title, content, id, author]);
 };
 
-export const deletePost = async (id) => {
-  await pool.query(SQL_POST_QUERIES.DELETE_POST, [id]);
+export const deletePost = async (id, author) => {
+  await pool.query(SQL_POST_QUERIES.DELETE_POST, [id, author]);
 };
