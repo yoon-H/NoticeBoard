@@ -192,7 +192,12 @@ router.put("/comments/:commentId", async (req, res, next) => {
     if (!author || !content)
       return res.status(400).json({ message: "모든 요소를 작성해주세요." });
 
-    await editComment(commentId, content, author);
+    const result = await editComment(commentId, content, author);
+
+    if (result.affectedRows === 0)
+      return res
+        .status(400)
+        .json({ message: "해당 댓글이 존재하지 않습니다." });
 
     return res.status(200).json({ message: "댓글이 수정되었습니다." });
   } catch (err) {
@@ -249,7 +254,12 @@ router.delete("/comments/:commentId", async (req, res, next) => {
     if (!author)
       return res.status(400).json({ message: "모든 요소를 작성해주세요." });
 
-    await deleteComment(commentId, author);
+    const result = await deleteComment(commentId, author);
+
+    if (result.affectedRows === 0)
+      return res
+        .status(400)
+        .json({ message: "해당 댓글이 존재하지 않습니다." });
 
     return res.status(200).json({ message: "댓글이 삭제되었습니다." });
   } catch (err) {
