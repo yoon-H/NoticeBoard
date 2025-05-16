@@ -1,6 +1,6 @@
 const SQL_COMMENT_QUERIES = {
   GET_COMMENTS:
-    "SELECT id, author, content, create_dt FROM comments WHERE post_id = ?",
+    "SELECT c.id AS id, u.name AS author, c.content AS content, c.create_dt AS time FROM comments AS c LEFT JOIN users AS u ON c.author = u.id WHERE post_id = ?",
   CREATE_COMMENT:
     "INSERT INTO comments (author, content, post_id) VALUES (?,?,?)",
   EDIT_COMMENT: "UPDATE comments SET content = ? WHERE id = ? AND author = ?",

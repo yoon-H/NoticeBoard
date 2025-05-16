@@ -74,7 +74,7 @@ router.get("/posts", async (req, res, next) => {
  *                 type: string
  *                 example: 제목입니다.
  *               author:
- *                 type: int
+ *                 type: number
  *                 example: 1
  *               content:
  *                 type: string
@@ -171,7 +171,7 @@ router.get("/posts/:postId", async (req, res, next) => {
  *                 type: string
  *                 example: 수정된 제목입니다.
  *               author:
- *                 type: int
+ *                 type: number
  *                 example: 1
  *               content:
  *                 type: string
@@ -221,7 +221,7 @@ router.put("/posts/:postId", async (req, res, next) => {
  *               - author
  *             properties:
  *               author:
- *                 type: int
+ *                 type: number
  *                 example: 1
  *     responses:
  *       200:
