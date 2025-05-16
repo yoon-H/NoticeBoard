@@ -1,4 +1,5 @@
 import { ID_REG, NAME_REG, PW_REG } from "../validation/auth.validation.js";
+import { columns } from "./column.js";
 import {
   DB_HOST,
   DB_NAME,
@@ -26,4 +27,5 @@ export const config = {
     pw_reg: PW_REG,
     name_reg: NAME_REG,
   },
+  column: columns,
 };
