@@ -9,11 +9,18 @@ import {
 const router = Router();
 /**
  * @swagger
- * /api/posts/:postId/comments:
+ * /api/posts/{postId}/comments:
  *   get:
  *     summary: "특정 게시글의 모든 댓글 조회"
  *     description: "서버에 Get방식으로 특정 게시글의 모든 댓글 조회 요청"
  *     tags: [Comment]
+ *     parameters:
+ *       - in: path
+ *         name: postId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: 조회할 게시글 ID
  *     requestBody:
  *       required: false
  *     responses:
@@ -53,11 +60,18 @@ router.get("/posts/:postId/comments", async (req, res, next) => {
 
 /**
  * @swagger
- * /api/posts/:postId/comments:
+ * /api/posts/{postId}/comments:
  *   post:
  *     summary: "댓글 작성"
  *     description: "서버에 댓글 데이터를 보내 Post방식으로 저장 요청"
  *     tags: [Comment]
+ *     parameters:
+ *       - in: path
+ *         name: postId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: 작성할 게시글 ID
  *     requestBody:
  *       required: true
  *       content:
@@ -104,11 +118,18 @@ router.post("/posts/:postId/comments", async (req, res, next) => {
 
 /**
  * @swagger
- * /api/comments/:commentId:
+ * /api/comments/{commentId}:
  *   put:
  *     summary: "댓글 수정"
  *     description: "서버에 수정 데이터를 보내 Put방식으로 수정 요청"
  *     tags: [Comment]
+ *     parameters:
+ *       - in: path
+ *         name: commentId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: 조회할 댓글 ID
  *     requestBody:
  *       required: true
  *       content:
@@ -155,11 +176,18 @@ router.put("/comments/:commentId", async (req, res, next) => {
 
 /**
  * @swagger
- * /api/comments/:commentId:
+ * /api/comments/{commentId}:
  *   delete:
  *     summary: "댓글 삭제"
  *     description: "서버에 Delete방식으로 삭제 요청"
  *     tags: [Comment]
+ *     parameters:
+ *       - in: path
+ *         name: commentId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: 삭제할 댓글 ID
  *     requestBody:
  *       required: true
  *       content:
