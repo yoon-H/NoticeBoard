@@ -50,7 +50,27 @@ router.get("/posts/:postId/comments", async (req, res, next) => {
   try {
     const postId = req.params.postId;
 
-    const comments = await getComments(postId);
+    if (isNaN(postId))
+      return res.status(400).json({ message: "자료형을 확인해주세요." });
+
+    const result = await getComments(postId);
+
+    if (result.length === 0)
+      return res
+        .status(400)
+        .json({ message: "해당 게시글이 존재하지 않습니다." });
+
+    const comments = [];
+    for (const row of result) {
+      if (row.id === null) continue;
+
+      comments.push({
+        id: row.id,
+        author: row.author,
+        content: row.content,
+        time: row.time,
+      });
+    }
 
     return res.status(200).json(comments);
   } catch (err) {
@@ -104,6 +124,9 @@ router.post("/posts/:postId/comments", async (req, res, next) => {
   try {
     const postId = req.params.postId;
     const { author, content } = req.body;
+
+    if (isNaN(postId))
+      return res.status(400).json({ message: "자료형을 확인해주세요." });
 
     if (!author || !content)
       return res.status(400).json({ message: "모든 요소를 작성해주세요." });
@@ -163,6 +186,9 @@ router.put("/comments/:commentId", async (req, res, next) => {
     const commentId = req.params.commentId;
     const { content, author } = req.body;
 
+    if (isNaN(commentId))
+      return res.status(400).json({ message: "자료형을 확인해주세요." });
+
     if (!author || !content)
       return res.status(400).json({ message: "모든 요소를 작성해주세요." });
 
@@ -216,6 +242,9 @@ router.delete("/comments/:commentId", async (req, res, next) => {
   try {
     const commentId = req.params.commentId;
     const { author } = req.body;
+
+    if (isNaN(commentId))
+      return res.status(400).json({ message: "자료형을 확인해주세요." });
 
     if (!author)
       return res.status(400).json({ message: "모든 요소를 작성해주세요." });
