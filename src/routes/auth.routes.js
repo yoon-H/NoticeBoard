@@ -12,6 +12,31 @@ const router = Router();
  *   post:
  *     summary: "유저 회원가입"
  *     description: "서버에 가입 데이터를 보내 Post방식으로 저장 요청"
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - id
+ *               - password
+ *               - confirmPassword
+ *               - name
+ *             properties:
+ *               id:
+ *                 type: string
+ *                 example: user123
+ *               password:
+ *                 type: string
+ *                 example: password@123
+ *               confirmPassword:
+ *                 type: string
+ *                 example: password@123
+ *               name:
+ *                 type: string
+ *                 example: cool_user
  *     responses:
  *       201:
  *         description: 성공 메시지
@@ -55,6 +80,42 @@ router.post("/auth/signup", async (req, res, next) => {
   }
 });
 
+// 로그인 API
+/**
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     summary: "유저 로그인"
+ *     description: "서버에 로그인 데이터를 보내 Post방식으로 요청"
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - id
+ *               - password
+ *             properties:
+ *               id:
+ *                 type: string
+ *                 example: user123
+ *               password:
+ *                 type: string
+ *                 example: password@123
+ *     responses:
+ *       200:
+ *         description: 성공 메시지
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                   message:
+ *                     type: string
+ *                     example : "로그인이 완료되었습니다."
+ */
 router.post("/auth/login", async (req, res, next) => {
   try {
     const { id, password } = req.body ?? {};
