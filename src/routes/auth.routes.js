@@ -6,9 +6,27 @@ import { createUser, findUserByLoginId } from "../db/query/user/user.db.js";
 const router = Router();
 
 // 회원가입 API
+/**
+ * @swagger
+ * /api/auth/signup:
+ *   post:
+ *     summary: "유저 회원가입"
+ *     description: "서버에 가입 데이터를 보내 Post방식으로 저장 요청"
+ *     responses:
+ *       201:
+ *         description: 성공 메시지
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                   message:
+ *                     type: string
+ *                     example : "회원가입이 완료되었습니다."
+ */
 router.post("/auth/signup", async (req, res, next) => {
   try {
-    const { id, password, confirmPassword, name } = req.body;
+    const { id, password, confirmPassword, name } = req.body ?? {};
 
     if (!id || !password || !confirmPassword || !name)
       return res.status(400).json({ message: "요소를 전부 적어주세요." });
@@ -39,7 +57,7 @@ router.post("/auth/signup", async (req, res, next) => {
 
 router.post("/auth/login", async (req, res, next) => {
   try {
-    const { id, password } = req.body;
+    const { id, password } = req.body ?? {};
 
     if (!id || !password)
       return res.status(400).json({ message: "요소를 전부 적어주세요." });
