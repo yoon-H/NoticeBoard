@@ -13,7 +13,7 @@ const router = Router();
  *   get:
  *     summary: "특정 게시글의 모든 댓글 조회"
  *     description: "서버에 Get방식으로 특정 게시글의 모든 댓글 조회 요청"
- *     tags: [Post]
+ *     tags: [Comment]
  *     requestBody:
  *       required: false
  *     responses:
