@@ -1,6 +1,20 @@
 # NoticeBoard
 
-# 커밋 컨벤션
+## 기능
+
+유저 : 회원가입, 로그인 (auth.routes.js)
+
+게시글 : 작성, 조회, 수정, 삭제 (post.routes.js)
+
+댓글 : 작성, 조회, 수정, 삭제 (comment.routes.js)
+
+## ERD
+
+![image](https://github.com/user-attachments/assets/4e9fdcab-58e7-4e65-962c-49b84b57a40c)
+
+
+
+## 커밋 컨벤션
 - 접두사(1개만) + 한칸 띄우고 + 콜론 + 한칸 띄우고 + 내용적기
 - ex) add : monsterHandler 생성
 
