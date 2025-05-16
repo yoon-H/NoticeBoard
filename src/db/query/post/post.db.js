@@ -18,9 +18,18 @@ export const getPost = async (id) => {
 };
 
 export const editPost = async (title, content, id, author) => {
-  await pool.query(SQL_POST_QUERIES.EDIT_POST, [title, content, id, author]);
+  const [row] = await pool.query(SQL_POST_QUERIES.EDIT_POST, [
+    title,
+    content,
+    id,
+    author,
+  ]);
+
+  return row;
 };
 
 export const deletePost = async (id, author) => {
-  await pool.query(SQL_POST_QUERIES.DELETE_POST, [id, author]);
+  const [row] = await pool.query(SQL_POST_QUERIES.DELETE_POST, [id, author]);
+
+  return row;
 };

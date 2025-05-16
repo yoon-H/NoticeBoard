@@ -148,7 +148,15 @@ router.get("/posts/:postId", async (req, res, next) => {
   try {
     const postId = req.params.postId;
 
+    if (isNaN(postId))
+      return res.status(400).json({ message: "자료형을 확인해주세요." });
+
     const post = await getPost(postId);
+
+    if (!post)
+      return res
+        .status(400)
+        .json({ message: "해당 게시글이 존재하지 않습니다." });
 
     return res.status(200).json(post);
   } catch (err) {
@@ -207,10 +215,18 @@ router.put("/posts/:postId", async (req, res, next) => {
     const postId = req.params.postId;
     const { title, content, author } = req.body;
 
+    if (isNaN(postId))
+      return res.status(400).json({ message: "자료형을 확인해주세요." });
+
     if (!title || !author || !content)
       return res.status(400).json({ message: "요소를 전부 입력해주세요." });
 
-    await editPost(title, content, postId, author);
+    const result = await editPost(title, content, postId, author);
+
+    if (result.affectedRows === 0)
+      return res
+        .status(400)
+        .json({ message: "해당 게시글이 존재하지 않습니다." });
 
     return res.status(200).json({ message: "게시글이 수정되었습니다." });
   } catch (err) {
@@ -264,7 +280,15 @@ router.delete("/posts/:postId", async (req, res, next) => {
     if (!author)
       return res.status(400).json({ message: "요소를 전부 입력해주세요." });
 
-    await deletePost(postId, author);
+    if (isNaN(postId))
+      return res.status(400).json({ message: "자료형을 확인해주세요." });
+
+    const result = await deletePost(postId, author);
+
+    if (result.affectedRows === 0)
+      return res
+        .status(400)
+        .json({ message: "해당 게시글이 존재하지 않습니다." });
 
     return res.status(200).json({ message: "게시글이 삭제되었습니다." });
   } catch (err) {
