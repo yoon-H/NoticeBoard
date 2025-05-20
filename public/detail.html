@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>상세 페이지 </title>
+    <style>
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            padding: 0px;
+
+            border-bottom-color: crimson;
+            border-bottom-width: 5px;
+            border-bottom-style: solid;
+        }
+
+        #my-title {
+            display: inline-block;
+            vertical-align: middle;
+
+            margin: 8px;
+            padding: 0;
+        }
+
+        ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+
+        li.icon {
+            flex-basis: 25%;
+        }
+
+        a {
+            display: block;
+            text-align: center;
+
+            text-decoration: none;
+            color: black;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        header a {
+            margin: 4px;
+            margin-bottom: 0;
+            padding: 8px 16px;
+            padding-bottom: 0;
+        }
+
+        #post-container {}
+
+        /* 
+        #board-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        #board-header {
+            display: flex;
+            justify-content: flex-end;
+            margin: 16px 0;
+
+            border-bottom-color: rgb(255, 81, 81);
+            border-bottom-width: 2px;
+            border-bottom-style: solid;
+        }
+
+        #write-btn {
+            font-size: 18px;
+            border: none;
+            background-color: white;
+            cursor: pointer;
+        }
+
+        #write-btn:hover {
+            text-decoration: underline;
+        }
+
+        #post-list {
+            margin: 16px 10px;
+        }
+
+        .post {
+            display: flex;
+            padding: 0px 10px;
+
+            justify-content: space-between;
+
+            border-bottom-color: black;
+            border-bottom-width: 1px;
+            border-bottom-style: solid;
+        }
+
+        .post * {
+            margin: 5px;
+            text-align: center;
+        }
+
+        .post .number {
+            flex-basis: 5%;
+        }
+
+        .post .title {
+            flex-basis: 85%;
+        }
+
+        .post .author {
+            flex-basis: 10%;
+        } */
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1 id="my-title">게시판</h1>
+        <ul>
+            <li><a href="#">로그인</a></li>
+        </ul>
+    </header>
+    <div id="post-container">
+        <div id="post-header">
+            <p id="title">글 제목</p>
+            <p id="time">작성(수정)시간</p>
+            <p id="author">작성자</p>
+        </div>
+        <div id="post-content">
+            <p>
+                글 내용
+            </p>
+        </div>
+        <div id="comment-container">
+            <div class="comment">
+                <p id="author">작성자</p>
+                <p id="time">작성시간</p>
+                <p id="content">댓글 내용</p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
