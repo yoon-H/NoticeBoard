@@ -6,7 +6,8 @@ CREATE TABLE IF NOT EXISTS users
     name            VARCHAR(255) UNIQUE,
     login_id        VARCHAR(255) UNIQUE,
     password        VARCHAR(255),
-    create_dt       TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    create_dt       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    update_dt       TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS posts
@@ -16,6 +17,7 @@ CREATE TABLE IF NOT EXISTS posts
     author          INT,
     content         TEXT,
     create_dt       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    update_dt       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (author) REFERENCES users(id) ON UPDATE CASCADE ON DELETE SET NULL
 );
 
@@ -26,6 +28,7 @@ CREATE TABLE IF NOT EXISTS comments
     content         TEXT,
     post_id         INT,
     create_dt       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    update_dt       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (author) REFERENCES users(id) ON UPDATE CASCADE ON DELETE SET NULL,
     FOREIGN KEY (post_id) REFERENCES posts(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
