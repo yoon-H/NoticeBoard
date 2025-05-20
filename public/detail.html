@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>상세 페이지 </title>
+    <title>상세 페이지</title>
     <style>
         header {
             display: flex;
@@ -56,18 +56,16 @@
             padding-bottom: 0;
         }
 
-        #post-container {}
-
-        /* 
-        #board-container {
+        #post-container {
             max-width: 800px;
             margin: 0 auto;
             padding: 16px;
+
+            background-color: aqua;
         }
 
-        #board-header {
-            display: flex;
-            justify-content: flex-end;
+
+        #post-header {
             margin: 16px 0;
 
             border-bottom-color: rgb(255, 81, 81);
@@ -75,48 +73,41 @@
             border-bottom-style: solid;
         }
 
-        #write-btn {
-            font-size: 18px;
-            border: none;
-            background-color: white;
-            cursor: pointer;
+        #post-header #title {
+            margin: 0;
         }
 
-        #write-btn:hover {
-            text-decoration: underline;
-        }
-
-        #post-list {
-            margin: 16px 10px;
-        }
-
-        .post {
+        #post-info {
             display: flex;
-            padding: 0px 10px;
+            justify-content: flex-end;
+            margin: 0;
+            gap: 15px;
+        }
 
-            justify-content: space-between;
+        .time {
+            color: gray;
+        }
 
-            border-bottom-color: black;
+        #post-info #author {}
+
+        #post-content {
+            border-bottom-color: rgb(255, 81, 81);
+            border-bottom-width: 2px;
+            border-bottom-style: solid;
+        }
+
+        #comment-container {}
+
+        .comment {
+            border-bottom-color: rgb(255, 81, 81);
             border-bottom-width: 1px;
             border-bottom-style: solid;
         }
 
-        .post * {
-            margin: 5px;
-            text-align: center;
+        .comment #comment-info {
+            display: flex;
+            gap: 10px;
         }
-
-        .post .number {
-            flex-basis: 5%;
-        }
-
-        .post .title {
-            flex-basis: 85%;
-        }
-
-        .post .author {
-            flex-basis: 10%;
-        } */
     </style>
 </head>
 
@@ -129,9 +120,12 @@
     </header>
     <div id="post-container">
         <div id="post-header">
-            <p id="title">글 제목</p>
-            <p id="time">작성(수정)시간</p>
-            <p id="author">작성자</p>
+            <h1 id="title">글 제목</h1>
+            <div id="post-info">
+                <p class="time">작성(수정)시간</p>
+                <p id="author">작성자</p>
+            </div>
+
         </div>
         <div id="post-content">
             <p>
@@ -140,8 +134,10 @@
         </div>
         <div id="comment-container">
             <div class="comment">
-                <p id="author">작성자</p>
-                <p id="time">작성시간</p>
+                <div id="comment-info">
+                    <p id="author">작성자</p>
+                    <p class="time">작성시간</p>
+                </div>
                 <p id="content">댓글 내용</p>
             </div>
         </div>
