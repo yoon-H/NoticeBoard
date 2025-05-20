@@ -1,11 +1,105 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>게시판 웹사이트</title>
+    <style>
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            padding: 0px;
+
+            border-bottom-color: crimson;
+            border-bottom-width: 5px;
+            border-bottom-style: solid;
+        }
+
+        #title {
+            display: inline-block;
+            vertical-align: middle;
+
+            margin: 8px;
+            padding: 0;
+        }
+
+        ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+
+        li.icon {
+            flex-basis: 25%;
+        }
+
+        a {
+            display: block;
+            text-align: center;
+            margin: 4px;
+            margin-bottom: 0;
+            padding: 8px 16px;
+            padding-bottom: 0;
+
+            text-decoration: none;
+            color: black;
+        }
+
+        #board-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        #board-header {
+            display: flex;
+            justify-content: flex-end;
+            margin: 16px 0;
+
+            border-bottom-color: black;
+            border-bottom-width: 2px;
+            border-bottom-style: solid;
+        }
+
+        #write-btn {
+            font-size: 18px;
+            border: none;
+            background-color: white;
+            cursor: pointer;
+        }
+
+        .bottom-line {
+            border-bottom-color: black;
+            border-bottom-width: 1px;
+            border-bottom-style: solid;
+        }
+
+        #post-list {}
+
+        .post {}
+    </style>
 </head>
+
 <body>
-    
+    <header>
+        <h1 id="title">게시판</h1>
+        <ul>
+            <li><a href="#">로그인</a></li>
+        </ul>
+    </header>
+    <div id="board-container">
+        <div id="board-header">
+            <button type="button" id="write-btn" onclick="location.href='joinUs.jsp' ">글쓰기</button>
+        </div>
+
+        <div class="bottom-line"></div>
+        <div id="post-list">
+        </div>
+    </div>
 </body>
+
 </html>
