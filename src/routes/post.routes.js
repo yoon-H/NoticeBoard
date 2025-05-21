@@ -224,7 +224,8 @@ router.get("/posts/:postId", async (req, res, next) => {
 router.put("/posts/:postId", authMiddleware, async (req, res, next) => {
   try {
     const postId = req.params.postId;
-    const { title, content, author } = req.body;
+    const { title, content } = req.body;
+    const author = req.user.id;
 
     if (isNaN(postId))
       return res.status(400).json({ message: "자료형을 확인해주세요." });
@@ -286,7 +287,7 @@ router.put("/posts/:postId", authMiddleware, async (req, res, next) => {
 router.delete("/posts/:postId", authMiddleware, async (req, res, next) => {
   try {
     const postId = req.params.postId;
-    const { author } = req.body;
+    const author = req.user.id;
 
     if (!author)
       return res.status(400).json({ message: "요소를 전부 입력해주세요." });
