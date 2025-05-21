@@ -1,6 +1,5 @@
 export const formatDate = (date) => {
-  const [day, times] = date.split("T");
-  const [time, tmp] = times.split(".");
+  const result = new Date(date).toISOString().slice(0, 19).replace("T", " ");
 
-  return day + " " + time;
+  return result;
 };
