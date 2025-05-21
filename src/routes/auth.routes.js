@@ -2,6 +2,7 @@ import { Router } from "express";
 import { config } from "../config/config.js";
 import bcrypt from "bcrypt";
 import { createUser, findUserByLoginId } from "../db/query/user/user.db.js";
+import { generateToken } from "../utils/token.js";
 
 const router = Router();
 
@@ -123,6 +124,12 @@ router.post("/auth/login", async (req, res, next) => {
     if (!id || !password)
       return res.status(400).json({ message: "요소를 전부 적어주세요." });
 
+    // 유효성 검사
+    if (!config.reg.id_reg.test(id))
+      return res.status(400).json({ message: "아이디가 적합하지 않습니다." });
+    if (!config.reg.pw_reg.test(password))
+      return res.status(400).json({ message: "비밀번호를 다시 입력해주세요." });
+
     // 가입된 사용자 확인
     const user = await findUserByLoginId(id);
 
@@ -133,6 +140,9 @@ router.post("/auth/login", async (req, res, next) => {
 
     if (!(await bcrypt.compare(password, user.password)))
       return res.status(400).json({ message: "비밀번호가 일치하지 않습니다." });
+
+    const token = generateToken(user.id);
+    res.cookie("authorization", `Bearer ${token}`);
 
     return res.status(200).json({ message: "로그인이 완료되었습니다." });
   } catch (err) {
