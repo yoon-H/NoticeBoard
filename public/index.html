@@ -116,11 +116,46 @@
         }
     </style>
     <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
+    <script>
+        $(document).ready(function () {
+            const root = 'http://localhost:3000/api';
+
+            const info = document.getElementById("info");
+
+            $.ajax({
+                url: root + `/posts`,
+                method: 'get',
+                success: function (data) {
+                    if (!data) return;
+
+                    for (const post of data) {
+                        info.insertAdjacentHTML("afterend",
+                            `<div class="post">
+                                <p class="number">${post.id}</p>
+                                <a href="./detail.html?id=${post.id}" class="title">${post.title}</a>
+                                <p class="author">${post.author}</p>
+                            </div>`
+                        );
+                    }
+                },
+                error: function (req, status, err) {
+                    const res = req.responseJSON;
+
+                    if (res && res.message)
+                        alert(res.message);
+
+                    return;
+                }
+            });
+
+
+        })
+    </script>
 </head>
 
 <body>
     <header>
-        <h1 id="my-title">게시판</h1>
+        <h1 id="my-title"><a href="./index.html">게시판</a></h1>
         <ul>
             <li><a href="./signup.html">회원가입</a></li>
             <li><a href="./login.html">로그인</a></li>
@@ -128,10 +163,10 @@
     </header>
     <div id="board-container">
         <div id="board-header">
-            <a id="write-btn" href="">글쓰기</a>
+            <a id="write-btn" href="./post.html">글쓰기</a>
         </div>
         <div id="post-list">
-            <div class="post">
+            <div class="post" id="info">
                 <p class="number">번호</p>
                 <p class="title">제목</p>
                 <p class="author">저자</p>
