@@ -8,7 +8,13 @@ export const getAllPosts = async () => {
 };
 
 export const createPost = async (title, author, content) => {
-  await pool.query(SQL_POST_QUERIES.CREATE_POST, [title, author, content]);
+  const [row] = await pool.query(SQL_POST_QUERIES.CREATE_POST, [
+    title,
+    author,
+    content,
+  ]);
+
+  return row;
 };
 
 export const getPost = async (id) => {
