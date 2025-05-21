@@ -17,7 +17,7 @@ export const authMiddleware = async (req, res, next) => {
         .json({ message: "토큰 타입이 일치하지 않습니다." });
 
     const data = jwt.verify(token, process.env.JWT_KEY);
-    const id = data.id;
+    const id = data.userId;
 
     const user = await findUserById(id);
 
@@ -26,6 +26,8 @@ export const authMiddleware = async (req, res, next) => {
     next();
   } catch (err) {
     res.clearCookie("authorization");
+
+    console.log(err);
 
     // jwt.verify에서 일어난 에러 처리
     switch (err.name) {
@@ -37,7 +39,7 @@ export const authMiddleware = async (req, res, next) => {
       default:
         return res
           .status(401)
-          .json({ message: error.message ?? "비정상적인 요청입니다." });
+          .json({ message: err.message ?? "비정상적인 요청입니다." });
     }
   }
 };
