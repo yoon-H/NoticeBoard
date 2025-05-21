@@ -129,9 +129,26 @@
         $(document).ready(function () {
             const root = 'http://localhost:3000/api';
 
+            // 글 아이디 추출
             const params = new URLSearchParams(window.location.search);
             const postId = params.get("id");
             let authorId;
+
+            // 토큰 가져오기
+            const cookies = document.cookie.split(';');
+            const name = "authorization";
+
+            let token;
+
+            for (let cookie of cookies) {
+                const [key, value] = cookie.trim().split('=');
+                if (key === name) {
+                    token = value;
+                    break;
+                };
+            }
+
+            const decodedToken = jwt_decode(token);
 
             // 글 element
             const title = document.getElementById("title");
@@ -196,28 +213,38 @@
 
             // 수정 버튼
             $("#edit-btn").on("click", function () {
-                const cookies = document.cookie.split(';');
-                const name = "authorization";
-
-                let token;
-
-                for (let cookie of cookies) {
-                    const [key, value] = cookie.trim().split('=');
-                    if (key === name) {
-                        token = value;
-                        break;
-                    };
+                if (decodedToken.userId !== authorId) {
+                    alert("작성자가 아닙니다.");
+                    return;
                 }
 
-                const decoded = jwt_decode(token);
+                const currentTime = Math.floor(Date.now() / 1000);
 
-                if (decoded.userId !== authorId) return;
+                if (decodedToken.exp && decodedToken.exp < currentTime) {
+                    alert("토큰이 만료되었습니다.");
+                    console.log("토큰이 만료되었습니다.");
+                    return;
+                }
 
                 window.location.replace(`./post.html?id=${postId}`);
             })
 
             // 삭제 버튼
             $("#delete-btn").on("click", function () {
+                if (decodedToken.userId !== authorId) {
+                    alert("작성자가 아닙니다.");
+                    return;
+                }
+
+                const currentTime = Math.floor(Date.now() / 1000);
+
+                if (decodedToken.exp && decodedToken.exp < currentTime) {
+                    alert("토큰이 만료되었습니다.");
+                    console.log("토큰이 만료되었습니다.");
+                    return;
+                }
+
+
                 $.ajax({
                     url: root + `/posts/${postId}`,
                     method: 'delete',
