@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인</title>
+    <style>
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            padding: 0px;
+
+            border-bottom-color: crimson;
+            border-bottom-width: 5px;
+            border-bottom-style: solid;
+        }
+
+        #my-title {
+            display: inline-block;
+            vertical-align: middle;
+
+            margin: 8px;
+            padding: 0;
+        }
+
+        ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+
+        li.icon {
+            flex-basis: 25%;
+        }
+
+        a {
+            display: block;
+            text-align: center;
+
+            text-decoration: none;
+            color: black;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        header a {
+            margin: 4px;
+            margin-bottom: 0;
+            padding: 8px 16px;
+            padding-bottom: 0;
+        }
+
+        #login-container {
+            width: 600px;
+
+            margin: 30px auto;
+            padding: 16px;
+
+            border-radius: 5px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+        }
+
+
+        #login-header {}
+
+        #login-header .input-text {
+            margin: 20px 30px;
+            display: flex;
+            align-items: center;
+        }
+
+        #login-header p {
+            width: 150px;
+        }
+
+        #login-header input {
+            height: 20px;
+            width: 300px;
+        }
+
+        #submit {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        #submit-btn {
+            border: none;
+            border-radius: 5px;
+            background-color: rgb(255, 81, 81);
+
+            width: 60px;
+            margin-top: 5px;
+            font-size: 16px;
+            color: white;
+
+            cursor: pointer;
+        }
+
+        #submit-btn:hover {
+            background-color: crimson;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1 id="my-title">게시판</h1>
+        <ul>
+            <li><a href="#">회원가입</a></li>
+            <li><a href="#">로그인</a></li>
+        </ul>
+    </header>
+    <div id="login-container">
+        <div id="login-header">
+            <div class="input-text">
+                <p>아이디 </p>
+                <input type="text" id="login-id" placeholder="아이디">
+            </div>
+            <div class="input-text">
+                <p>비밀번호 </p>
+                <input type="text" id="password" placeholder="비밀번호">
+            </div>
+        </div>
+        <div id="submit">
+            <button type="submit" id="submit-btn">제출</button>
+        </div>
+    </div>
+</body>
+
+</html>
