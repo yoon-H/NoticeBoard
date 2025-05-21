@@ -162,10 +162,13 @@
                     },
                     success: function (data) {
                         alert("글이 작성되었습니다.");
-                        window.location.replace("./detail.html");
+                        window.location.replace(`./detail.html?id=${data.id}`);
                     },
                     error: function (req, status, err) {
-                        alert(req + ' / ' + status + ' / ' + err + err.message);
+                        const res = req.responseJSON;
+
+                        if (res && res.message)
+                            alert(res.message);
                     }
                 });
             })
@@ -175,7 +178,7 @@
 
 <body>
     <header>
-        <h1 id="my-title">게시판</h1>
+        <h1 id="my-title"><a href="./index.html">게시판</a></h1>
         <ul>
             <li><a href="./signup.html">회원가입</a></li>
             <li><a href="./login.html">로그인</a></li>
