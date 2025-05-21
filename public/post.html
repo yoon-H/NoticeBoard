@@ -134,35 +134,23 @@
         $(document).ready(function () {
             const root = 'http://localhost:3000/api';
 
-            $("#submit-btn").on("click", function () {
+            const params = new URLSearchParams(window.location.search);
+            const postId = params.get("id");
 
-                // 데이터
-                const title = document.getElementById("title").value;
-                const content = document.getElementById("content").value;
+            const isEditing = postId ? true : false;
 
-                // 길이 검사
-                if (title.length < 2) {
-                    alert("제목은 2자 이상 입력해주세요.");
-                    return;
-                }
+            const title = document.getElementById("title");
+            const content = document.getElementById("content");
 
-                if (content.length < 10) {
-                    alert("내용은 10자 이상 입력해주세요.");
-                    return;
-                }
-
-
+            if (isEditing) {
                 $.ajax({
-                    url: root + '/posts',
-                    method: 'post',
-                    dataType: 'json',
-                    data: {
-                        title: title,
-                        content: content,
-                    },
+                    url: root + `/posts/${postId}`,
+                    method: 'get',
                     success: function (data) {
-                        alert("글이 작성되었습니다.");
-                        window.location.replace(`./detail.html?id=${data.id}`);
+                        console.log(data);
+                        title.value = data.title;
+                        console.log(data.title);
+                        content.textContent = data.content;
                     },
                     error: function (req, status, err) {
                         const res = req.responseJSON;
@@ -171,6 +159,69 @@
                             alert(res.message);
                     }
                 });
+            }
+
+            console.log(title.value);
+
+            $("#submit-btn").on("click", function () {
+
+                // 데이터
+                const titleValue = title.value;
+                const contentValue = content.value;
+
+                // 길이 검사
+                if (titleValue.length < 2) {
+                    alert("제목은 2자 이상 입력해주세요.");
+                    return;
+                }
+
+                if (contentValue.length < 10) {
+                    alert("내용은 10자 이상 입력해주세요.");
+                    return;
+                }
+
+                if (isEditing) {
+                    $.ajax({
+                        url: root + `/posts/${postId}`,
+                        method: 'put',
+                        dataType: 'json',
+                        data: {
+                            title: titleValue,
+                            content: contentValue,
+                        },
+                        success: function (data) {
+                            alert("글이 수정되었습니다.");
+                            window.location.replace(`./detail.html?id=${postId}`);
+                        },
+                        error: function (req, status, err) {
+                            const res = req.responseJSON;
+
+                            if (res && res.message)
+                                alert(res.message);
+                        }
+                    });
+                } else {
+                    $.ajax({
+                        url: root + '/posts',
+                        method: 'post',
+                        dataType: 'json',
+                        data: {
+                            title: titleValue,
+                            content: contentValue,
+                        },
+                        success: function (data) {
+                            alert("글이 작성되었습니다.");
+                            window.location.replace(`./detail.html?id=${data.id}`);
+                        },
+                        error: function (req, status, err) {
+                            const res = req.responseJSON;
+
+                            if (res && res.message)
+                                alert(res.message);
+                        }
+                    });
+                }
+
             })
         })
     </script>
