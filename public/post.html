@@ -129,14 +129,56 @@
             background-color: crimson;
         }
     </style>
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
+    <script>
+        $(document).ready(function () {
+            const root = 'http://localhost:3000/api';
+
+            $("#submit-btn").on("click", function () {
+
+                // 데이터
+                const title = document.getElementById("title").value;
+                const content = document.getElementById("content").value;
+
+                // 길이 검사
+                if (title.length < 2) {
+                    alert("제목은 2자 이상 입력해주세요.");
+                    return;
+                }
+
+                if (content.length < 10) {
+                    alert("내용은 10자 이상 입력해주세요.");
+                    return;
+                }
+
+
+                $.ajax({
+                    url: root + '/posts',
+                    method: 'post',
+                    dataType: 'json',
+                    data: {
+                        title: title,
+                        content: content,
+                    },
+                    success: function (data) {
+                        alert("글이 작성되었습니다.");
+                        window.location.replace("./detail.html");
+                    },
+                    error: function (req, status, err) {
+                        alert(req + ' / ' + status + ' / ' + err + err.message);
+                    }
+                });
+            })
+        })
+    </script>
 </head>
 
 <body>
     <header>
         <h1 id="my-title">게시판</h1>
         <ul>
-            <li><a href="#">회원가입</a></li>
-            <li><a href="#">로그인</a></li>
+            <li><a href="./signup.html">회원가입</a></li>
+            <li><a href="./login.html">로그인</a></li>
         </ul>
     </header>
     <div id="post-container">
@@ -151,4 +193,5 @@
         </div>
     </div>
 </body>
+
 </html>
