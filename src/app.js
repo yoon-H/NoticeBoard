@@ -1,5 +1,6 @@
 import express from "express";
 import { config } from "./config/config.js";
+import cookieParser from "cookie-parser";
 
 import errorHandlerMiddleware from "./middlewares/error-handler.middleware.js";
 
@@ -13,6 +14,7 @@ const HOST = config.server.host;
 const PORT = config.server.port;
 
 app.use(express.json());
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
