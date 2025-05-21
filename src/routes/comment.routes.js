@@ -5,6 +5,7 @@ import {
   editComment,
   deleteComment,
 } from "../db/query/comment/comment.db.js";
+import { formatDate } from "../utils/dateformatter.js";
 
 const router = Router();
 /**
@@ -68,7 +69,7 @@ router.get("/posts/:postId/comments", async (req, res, next) => {
         id: row.id,
         author: row.author,
         content: row.content,
-        time: row.time,
+        time: formatDate(row.time),
       });
     }
 

@@ -7,6 +7,7 @@ import {
   getPost,
 } from "../db/query/post/post.db.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
+import { formatDate } from "../utils/dateformatter.js";
 
 const router = Router();
 
@@ -46,6 +47,10 @@ const router = Router();
 router.get("/posts", async (req, res, next) => {
   try {
     const posts = await getAllPosts();
+
+    for (const post of posts) {
+      post.time = formatDate(post.time);
+    }
 
     return res.status(200).json(posts);
   } catch (err) {
@@ -100,9 +105,11 @@ router.post("/posts", authMiddleware, async (req, res, next) => {
     if (!title || !author || !content)
       return res.status(400).json({ message: "요소를 전부 입력해주세요." });
 
-    await createPost(title, author, content);
+    const result = await createPost(title, author, content);
 
-    return res.status(201).json({ message: "게시글이 저장되었습니다." });
+    return res
+      .status(201)
+      .json({ id: result.insertId, message: "게시글이 저장되었습니다." });
   } catch (err) {
     next(err);
   }
@@ -159,6 +166,8 @@ router.get("/posts/:postId", async (req, res, next) => {
       return res
         .status(400)
         .json({ message: "해당 게시글이 존재하지 않습니다." });
+
+    post.time = formatDate(post.time);
 
     return res.status(200).json(post);
   } catch (err) {
