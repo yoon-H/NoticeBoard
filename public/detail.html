@@ -104,26 +104,92 @@
             border-bottom-style: solid;
         }
 
-        .comment #comment-info {
+        .comment .comment-info {
             display: flex;
             gap: 10px;
         }
     </style>
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
+    <script>
+        $(document).ready(function () {
+            const root = 'http://localhost:3000/api';
+
+            const params = new URLSearchParams(window.location.search);
+            const postId = params.get("id");
+
+            // 글 element
+            const title = document.getElementById("title");
+            const postTime = document.getElementById("post-time");
+            const author = document.getElementById("author");
+            const content = document.getElementById("post-content");
+
+            $.ajax({
+                url: root + `/posts/${postId}`,
+                method: 'get',
+                success: function (data) {
+                    if (!data) return;
+
+                    title.textContent = data.title;
+                    postTime.textContent = data.time;
+                    author.textContent = data.author;
+                    content.textContent = data.content;
+                },
+                error: function (req, status, err) {
+                    const res = req.responseJSON;
+
+                    if (res && res.message)
+                        alert(res.message);
+
+                    return;
+                }
+            });
+
+            const commentContainer = document.getElementById("comment-container");
+
+            $.ajax({
+                url: root + `/posts/${postId}/comments`,
+                method: 'get',
+                success: function (data) {
+                    if (!data) return;
+
+                    for (const comment of data) {
+                        commentContainer.insertAdjacentHTML("afterbegin",
+                            `<div class="comment">
+                                <div class="comment-info">
+                                    <p class="author">${comment.author}</p>
+                                    <p class="time" class="comment-time">${comment.time}</p>
+                                </div>
+                                <p class="content">${comment.content}</p>
+                            </div>`
+                        );
+                    }
+                },
+                error: function (req, status, err) {
+                    const res = req.responseJSON;
+
+                    if (res && res.message)
+                        alert(res.message);
+
+                    return;
+                }
+            });
+        })
+    </script>
 </head>
 
 <body>
     <header>
-        <h1 id="my-title">게시판</h1>
+        <h1 id="my-title"><a href="./index.html">게시판</a></h1>
         <ul>
-            <li><a href="#">회원가입</a></li>
-            <li><a href="#">로그인</a></li>
+            <li><a href="./signup.html">회원가입</a></li>
+            <li><a href="./login.html">로그인</a></li>
         </ul>
     </header>
     <div id="post-container">
         <div id="post-header">
             <h1 id="title">글 제목</h1>
             <div id="post-info">
-                <p class="time">작성(수정)시간</p>
+                <p class="time" id="post-time">작성(수정)시간</p>
                 <p id="author">작성자</p>
             </div>
 
@@ -135,12 +201,15 @@
         </div>
         <div id="comment-container">
             <div class="comment">
-                <div id="comment-info">
-                    <p id="author">작성자</p>
-                    <p class="time">작성시간</p>
+                <div class="comment-info">
+                    <p class="author">작성자</p>
+                    <p class="time" class="comment-time">작성시간</p>
                 </div>
-                <p id="content">댓글 내용</p>
+                <p class="content">댓글 내용</p>
             </div>
+        </div>
+        <div id="input-comment">
+            
         </div>
     </div>
 </body>
