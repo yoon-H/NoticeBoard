@@ -187,6 +187,11 @@
         let decodedToken;
         const root = 'http://localhost:3000/api';
 
+        // 글 아이디 추출
+        const params = new URLSearchParams(window.location.search);
+        const postId = params.get("id");
+        let postAuthorId;
+
         function checkToken(token, authorId = null) {
             if (!token) {
                 alert("로그인을 해주세요.");
@@ -214,11 +219,6 @@
 
 
         $(document).ready(function () {
-            // 글 아이디 추출
-            const params = new URLSearchParams(window.location.search);
-            const postId = params.get("id");
-            let postAuthorId;
-
             // 토큰 가져오기
             const cookies = document.cookie.split(';');
             const name = "authorization";
