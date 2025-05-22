@@ -1,14 +1,17 @@
-export const formatDate = (createDate, updateDate) => {
-  const create = new Date(createDate);
-  const update = new Date(updateDate);
+export const formatDate = (createDate, updateDate = null) => {
+  const create = new Date(createDate).toLocaleString("ko-KR", {
+    timeZone: "Asia/Seoul",
+  });
+  const update = new Date(updateDate).toLocaleString("ko-KR", {
+    timeZone: "Asia/Seoul",
+  });
 
-  if (create.getTime() === update.getTime()) {
-    const result = update.toISOString().slice(0, 19).replace("T", " ");
+  if (create === update) {
+    const result = update;
 
     return result;
   } else {
-    const result =
-      update.toISOString().slice(0, 19).replace("T", " ") + " (수정됨)";
+    const result = update + " (수정됨)";
 
     return result;
   }

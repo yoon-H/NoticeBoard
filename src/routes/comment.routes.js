@@ -4,6 +4,7 @@ import {
   createComment,
   editComment,
   deleteComment,
+  getUpdateTime,
 } from "../db/query/comment/comment.db.js";
 import { formatDate } from "../utils/dateformatter.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
@@ -69,6 +70,7 @@ router.get("/posts/:postId/comments", async (req, res, next) => {
       comments.push({
         id: row.id,
         author: row.author,
+        authorId: row.authorId,
         content: row.content,
         time: formatDate(row.createTime, row.updateTime),
       });
@@ -204,10 +206,15 @@ router.put("/comments/:commentId", authMiddleware, async (req, res, next) => {
 
     if (result.affectedRows === 0)
       return res
-        .status(400)
+        .status(404)
         .json({ message: "해당 댓글이 존재하지 않습니다." });
 
-    return res.status(200).json({ message: "댓글이 수정되었습니다." });
+    const time = await getUpdateTime(commentId);
+
+    return res.status(200).json({
+      time: formatDate(null, time.time),
+      message: "댓글이 수정되었습니다.",
+    });
   } catch (err) {
     next(err);
   }
