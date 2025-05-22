@@ -49,7 +49,7 @@ router.get("/posts", async (req, res, next) => {
     const posts = await getAllPosts();
 
     for (const post of posts) {
-      post.time = formatDate(post.time);
+      post.time = formatDate(post.createTime, post.updateTime);
     }
 
     return res.status(200).json(posts);
@@ -167,7 +167,7 @@ router.get("/posts/:postId", async (req, res, next) => {
         .status(400)
         .json({ message: "해당 게시글이 존재하지 않습니다." });
 
-    post.time = formatDate(post.time);
+    post.time = formatDate(post.createTime, post.updateTime);
 
     return res.status(200).json(post);
   } catch (err) {
