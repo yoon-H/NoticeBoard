@@ -135,7 +135,7 @@ router.post("/auth/login", async (req, res, next) => {
 
     if (!user)
       return res
-        .status(400)
+        .status(404)
         .json({ message: "유저 정보가 존재하지 않습니다." });
 
     if (!(await bcrypt.compare(password, user.password)))

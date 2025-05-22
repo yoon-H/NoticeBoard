@@ -164,7 +164,7 @@ router.get("/posts/:postId", async (req, res, next) => {
 
     if (!post)
       return res
-        .status(400)
+        .status(404)
         .json({ message: "해당 게시글이 존재하지 않습니다." });
 
     post.time = formatDate(post.createTime, post.updateTime);
@@ -237,7 +237,7 @@ router.put("/posts/:postId", authMiddleware, async (req, res, next) => {
 
     if (result.affectedRows === 0)
       return res
-        .status(400)
+        .status(404)
         .json({ message: "해당 게시글이 존재하지 않습니다." });
 
     return res.status(200).json({ message: "게시글이 수정되었습니다." });
@@ -299,7 +299,7 @@ router.delete("/posts/:postId", authMiddleware, async (req, res, next) => {
 
     if (result.affectedRows === 0)
       return res
-        .status(400)
+        .status(404)
         .json({ message: "해당 게시글이 존재하지 않습니다." });
 
     return res.status(200).json({ message: "게시글이 삭제되었습니다." });

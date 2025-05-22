@@ -60,7 +60,7 @@ router.get("/posts/:postId/comments", async (req, res, next) => {
 
     if (result.length === 0)
       return res
-        .status(400)
+        .status(404)
         .json({ message: "해당 게시글이 존재하지 않습니다." });
 
     const comments = [];
@@ -276,7 +276,7 @@ router.delete(
 
       if (result.affectedRows === 0)
         return res
-          .status(400)
+          .status(404)
           .json({ message: "해당 댓글이 존재하지 않습니다." });
 
       return res.status(200).json({ message: "댓글이 삭제되었습니다." });
