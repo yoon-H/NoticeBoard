@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입</title>
+    <style>
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            padding: 0px;
+
+            border-bottom-color: crimson;
+            border-bottom-width: 5px;
+            border-bottom-style: solid;
+        }
+
+        #my-title {
+            display: inline-block;
+            vertical-align: middle;
+
+            margin: 8px;
+            padding: 0;
+        }
+
+        ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+
+        li.icon {
+            flex-basis: 25%;
+        }
+
+        a {
+            display: block;
+            text-align: center;
+
+            text-decoration: none;
+            color: black;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        header a {
+            margin: 4px;
+            margin-bottom: 0;
+            padding: 8px 16px;
+            padding-bottom: 0;
+        }
+
+        #signup-container {
+            width: 600px;
+
+            margin: 30px auto;
+            padding: 16px;
+
+            border-radius: 5px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+        }
+
+
+        #signup-header {}
+
+        #signup-header .input-text {
+            margin: 20px 30px;
+            display: flex;
+            align-items: center;
+        }
+
+        #signup-header p {
+            width: 150px;
+        }
+
+        #signup-header input {
+            height: 20px;
+            width: 300px;
+        }
+
+        #submit {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        #submit-btn {
+            border: none;
+            border-radius: 5px;
+            background-color: rgb(255, 81, 81);
+
+            width: 60px;
+            margin-top: 5px;
+            font-size: 16px;
+            color: white;
+
+            cursor: pointer;
+        }
+
+        #submit-btn:hover {
+            background-color: crimson;
+        }
+    </style>
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
+    <script>
+        $(document).ready(function () {
+            const root = 'http://localhost:3000/api';
+
+            $("#submit-btn").on("click", function () {
+
+                // 데이터
+                const id = document.getElementById("login-id").value;
+                const name = document.getElementById("name").value;
+                const password = document.getElementById("password").value;
+                const confirmPassword = document.getElementById("confirm-password").value;
+
+                // 정규식
+                const ID_REG = /^[a-z][a-z0-9]{3,19}/;
+                const PW_REG =
+                    /^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[+=%_!@#$^&*?])[A-Za-z0-9+=%_!@#$^&*?]{8,}$/;
+                const NAME_REG = /^[가-힣a-zA-Z0-9_-]{2,12}$/;
+
+                // 이메일 검사
+                if (!ID_REG.test(id))
+                    return alert("아이디를 다시 입력해주세요.");
+
+                // 닉네임 검사
+                if (!NAME_REG.test(name))
+                    return alert("닉네임을 다시 입력해주세요.");
+
+                // 비밀번호 검사
+                if (!PW_REG.test(password))
+                    return alert("비밀번호를 다시 입력해주세요.");
+
+                if (password !== confirmPassword)
+                    return alert("비밀번호와 일치하지 않습니다.");
+
+                $.ajax({
+                    url: root + '/auth/signup',
+                    method: 'post',
+                    dataType: 'json',
+                    data: {
+                        id: id,
+                        name: name,
+                        password: password,
+                        confirmPassword: confirmPassword
+                    },
+                    success: function (data) {
+                        alert("회원가입이 완료되었습니다.");
+                        window.location.replace("./index.html");
+                    },
+                    error: function (req, status, err) {
+                        const res = req.responseJSON;
+
+                        if (res && res.message)
+                            alert(res.message);
+                    }
+                });
+            })
+        })
+
+
+    </script>
+</head>
+
+<body>
+    <header>
+        <h1 id="my-title"><a href="./index.html">게시판</a></h1>
+        <ul>
+            <li><a href="./signup.html">회원가입</a></li>
+            <li><a href="./login.html">로그인</a></li>
+        </ul>
+    </header>
+    <div id="signup-container">
+        <div id="signup-header">
+            <div class="input-text">
+                <p>아이디 </p>
+                <input type="text" id="login-id" placeholder="아이디">
+            </div>
+            <div class="input-text">
+                <p>닉네임 </p>
+                <input type="text" id="name" placeholder="닉네임">
+            </div>
+            <div class="input-text">
+                <p>비밀번호 </p>
+                <input type="text" id="password" placeholder="비밀번호">
+            </div>
+            <div class="input-text">
+                <p>비밀번호 확인 </p>
+                <input type="text" id="confirm-password" placeholder="비밀번호 확인">
+            </div>
+        </div>
+        <div id="submit">
+            <button type="submit" id="submit-btn">제출</button>
+        </div>
+    </div>
+</body>
+
+</html>

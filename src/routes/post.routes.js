@@ -6,6 +6,8 @@ import {
   getAllPosts,
   getPost,
 } from "../db/query/post/post.db.js";
+import { authMiddleware } from "../middlewares/auth.middleware.js";
+import { formatDate } from "../utils/dateformatter.js";
 
 const router = Router();
 
@@ -45,6 +47,10 @@ const router = Router();
 router.get("/posts", async (req, res, next) => {
   try {
     const posts = await getAllPosts();
+
+    for (const post of posts) {
+      post.time = formatDate(post.createTime, post.updateTime);
+    }
 
     return res.status(200).json(posts);
   } catch (err) {
@@ -91,16 +97,19 @@ router.get("/posts", async (req, res, next) => {
  *                     type: string
  *                     example : "게시글이 저장되었습니다."
  */
-router.post("/posts", async (req, res, next) => {
+router.post("/posts", authMiddleware, async (req, res, next) => {
   try {
-    const { title, author, content } = req.body;
+    const { title, content } = req.body;
+    const author = req.user.id;
 
     if (!title || !author || !content)
       return res.status(400).json({ message: "요소를 전부 입력해주세요." });
 
-    await createPost(title, author, content);
+    const result = await createPost(title, author, content);
 
-    return res.status(201).json({ message: "게시글이 저장되었습니다." });
+    return res
+      .status(201)
+      .json({ id: result.insertId, message: "게시글이 저장되었습니다." });
   } catch (err) {
     next(err);
   }
@@ -155,8 +164,10 @@ router.get("/posts/:postId", async (req, res, next) => {
 
     if (!post)
       return res
-        .status(400)
+        .status(404)
         .json({ message: "해당 게시글이 존재하지 않습니다." });
+
+    post.time = formatDate(post.createTime, post.updateTime);
 
     return res.status(200).json(post);
   } catch (err) {
@@ -210,10 +221,11 @@ router.get("/posts/:postId", async (req, res, next) => {
  *                     type: string
  *                     example : "게시글이 수정되었습니다."
  */
-router.put("/posts/:postId", async (req, res, next) => {
+router.put("/posts/:postId", authMiddleware, async (req, res, next) => {
   try {
     const postId = req.params.postId;
-    const { title, content, author } = req.body;
+    const { title, content } = req.body;
+    const author = req.user.id;
 
     if (isNaN(postId))
       return res.status(400).json({ message: "자료형을 확인해주세요." });
@@ -225,7 +237,7 @@ router.put("/posts/:postId", async (req, res, next) => {
 
     if (result.affectedRows === 0)
       return res
-        .status(400)
+        .status(404)
         .json({ message: "해당 게시글이 존재하지 않습니다." });
 
     return res.status(200).json({ message: "게시글이 수정되었습니다." });
@@ -272,10 +284,10 @@ router.put("/posts/:postId", async (req, res, next) => {
  *                     type: string
  *                     example : "게시글이 삭제되었습니다."
  */
-router.delete("/posts/:postId", async (req, res, next) => {
+router.delete("/posts/:postId", authMiddleware, async (req, res, next) => {
   try {
     const postId = req.params.postId;
-    const { author } = req.body;
+    const author = req.user.id;
 
     if (!author)
       return res.status(400).json({ message: "요소를 전부 입력해주세요." });
@@ -287,7 +299,7 @@ router.delete("/posts/:postId", async (req, res, next) => {
 
     if (result.affectedRows === 0)
       return res
-        .status(400)
+        .status(404)
         .json({ message: "해당 게시글이 존재하지 않습니다." });
 
     return res.status(200).json({ message: "게시글이 삭제되었습니다." });

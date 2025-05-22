@@ -33,3 +33,9 @@ export const deleteComment = async (id, author) => {
 
   return row;
 };
+
+export const getUpdateTime = async (id) => {
+  const [row] = await pool.query(SQL_COMMENT_QUERIES.GET_UPDATE_TIME, [id]);
+
+  return row[0];
+};

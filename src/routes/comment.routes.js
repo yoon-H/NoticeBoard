@@ -4,7 +4,10 @@ import {
   createComment,
   editComment,
   deleteComment,
+  getUpdateTime,
 } from "../db/query/comment/comment.db.js";
+import { formatDate } from "../utils/dateformatter.js";
+import { authMiddleware } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 /**
@@ -57,7 +60,7 @@ router.get("/posts/:postId/comments", async (req, res, next) => {
 
     if (result.length === 0)
       return res
-        .status(400)
+        .status(404)
         .json({ message: "해당 게시글이 존재하지 않습니다." });
 
     const comments = [];
@@ -67,8 +70,9 @@ router.get("/posts/:postId/comments", async (req, res, next) => {
       comments.push({
         id: row.id,
         author: row.author,
+        authorId: row.authorId,
         content: row.content,
-        time: row.time,
+        time: formatDate(row.createTime, row.updateTime),
       });
     }
 
@@ -120,24 +124,29 @@ router.get("/posts/:postId/comments", async (req, res, next) => {
  *                     type: string
  *                     example : "댓글이 저장되었습니다."
  */
-router.post("/posts/:postId/comments", async (req, res, next) => {
-  try {
-    const postId = req.params.postId;
-    const { author, content } = req.body;
+router.post(
+  "/posts/:postId/comments",
+  authMiddleware,
+  async (req, res, next) => {
+    try {
+      const postId = req.params.postId;
+      const { content } = req.body;
+      const author = req.user.id;
 
-    if (isNaN(postId))
-      return res.status(400).json({ message: "자료형을 확인해주세요." });
+      if (isNaN(postId))
+        return res.status(400).json({ message: "자료형을 확인해주세요." });
 
-    if (!author || !content)
-      return res.status(400).json({ message: "모든 요소를 작성해주세요." });
+      if (!author || !content)
+        return res.status(400).json({ message: "모든 요소를 작성해주세요." });
 
-    await createComment(author, content, postId);
+      await createComment(author, content, postId);
 
-    return res.status(201).json({ message: "댓글이 저장되었습니다." });
-  } catch (err) {
-    next(err);
+      return res.status(201).json({ message: "댓글이 저장되었습니다." });
+    } catch (err) {
+      next(err);
+    }
   }
-});
+);
 
 /**
  * @swagger
@@ -181,10 +190,11 @@ router.post("/posts/:postId/comments", async (req, res, next) => {
  *                     type: string
  *                     example : "댓글이 수정되었습니다."
  */
-router.put("/comments/:commentId", async (req, res, next) => {
+router.put("/comments/:commentId", authMiddleware, async (req, res, next) => {
   try {
     const commentId = req.params.commentId;
-    const { content, author } = req.body;
+    const { content } = req.body;
+    const author = req.user.id;
 
     if (isNaN(commentId))
       return res.status(400).json({ message: "자료형을 확인해주세요." });
@@ -196,10 +206,15 @@ router.put("/comments/:commentId", async (req, res, next) => {
 
     if (result.affectedRows === 0)
       return res
-        .status(400)
+        .status(404)
         .json({ message: "해당 댓글이 존재하지 않습니다." });
 
-    return res.status(200).json({ message: "댓글이 수정되었습니다." });
+    const time = await getUpdateTime(commentId);
+
+    return res.status(200).json({
+      time: formatDate(null, time.time),
+      message: "댓글이 수정되었습니다.",
+    });
   } catch (err) {
     next(err);
   }
@@ -243,28 +258,32 @@ router.put("/comments/:commentId", async (req, res, next) => {
  *                     type: string
  *                     example : "댓글이 삭제되었습니다."
  */
-router.delete("/comments/:commentId", async (req, res, next) => {
-  try {
-    const commentId = req.params.commentId;
-    const { author } = req.body;
+router.delete(
+  "/comments/:commentId",
+  authMiddleware,
+  async (req, res, next) => {
+    try {
+      const commentId = req.params.commentId;
+      const author = req.user.id;
 
-    if (isNaN(commentId))
-      return res.status(400).json({ message: "자료형을 확인해주세요." });
+      if (isNaN(commentId))
+        return res.status(400).json({ message: "자료형을 확인해주세요." });
 
-    if (!author)
-      return res.status(400).json({ message: "모든 요소를 작성해주세요." });
+      if (!author)
+        return res.status(400).json({ message: "모든 요소를 작성해주세요." });
 
-    const result = await deleteComment(commentId, author);
+      const result = await deleteComment(commentId, author);
 
-    if (result.affectedRows === 0)
-      return res
-        .status(400)
-        .json({ message: "해당 댓글이 존재하지 않습니다." });
+      if (result.affectedRows === 0)
+        return res
+          .status(404)
+          .json({ message: "해당 댓글이 존재하지 않습니다." });
 
-    return res.status(200).json({ message: "댓글이 삭제되었습니다." });
-  } catch (err) {
-    next(err);
+      return res.status(200).json({ message: "댓글이 삭제되었습니다." });
+    } catch (err) {
+      next(err);
+    }
   }
-});
+);
 
 export default router;

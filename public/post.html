@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>글쓰기</title>
+    <style>
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            padding: 0px;
+
+            border-bottom-color: crimson;
+            border-bottom-width: 5px;
+            border-bottom-style: solid;
+        }
+
+        #my-title {
+            display: inline-block;
+            vertical-align: middle;
+
+            margin: 8px;
+            padding: 0;
+        }
+
+        ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+
+        li.icon {
+            flex-basis: 25%;
+        }
+
+        a {
+            display: block;
+            text-align: center;
+
+            text-decoration: none;
+            color: black;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        header a {
+            margin: 4px;
+            margin-bottom: 0;
+            padding: 8px 16px;
+            padding-bottom: 0;
+        }
+
+        #post-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 16px;
+
+            /* background-color: aqua; */
+        }
+
+
+        #post-header {
+            margin: 16px 0;
+
+            border-bottom-color: rgb(255, 81, 81);
+            border-bottom-width: 2px;
+            border-bottom-style: solid;
+        }
+
+        input {
+            border: none;
+            outline: none;
+        }
+
+        #post-header #title {
+            margin: 0;
+            padding-bottom: 10px;
+            font-size: 35px;
+        }
+
+        #post-info {
+            display: flex;
+            justify-content: flex-end;
+            margin: 0;
+            gap: 15px;
+        }
+
+        #post-content {
+            border-bottom-color: rgb(255, 81, 81);
+            border-bottom-width: 2px;
+            border-bottom-style: solid;
+        }
+
+        textarea {
+            border: none;
+            outline: none;
+            resize: none;
+
+            width: 100%;
+            height: 500px;
+
+        }
+
+        #submit {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        #submit-btn {
+            border: none;
+            border-radius: 5px;
+            background-color: rgb(255, 81, 81);
+
+            width: 60px;
+            margin-top: 5px;
+            font-size: 16px;
+            color: white;
+
+            cursor: pointer;
+        }
+
+        #submit-btn:hover {
+            background-color: crimson;
+        }
+    </style>
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
+    <script>
+        $(document).ready(function () {
+            const root = 'http://localhost:3000/api';
+
+            const params = new URLSearchParams(window.location.search);
+            const postId = params.get("id");
+
+            const isEditing = postId ? true : false;
+
+            const title = document.getElementById("title");
+            const content = document.getElementById("content");
+
+            if (isEditing) {
+                $.ajax({
+                    url: root + `/posts/${postId}`,
+                    method: 'get',
+                    success: function (data) {
+                        console.log(data);
+                        title.value = data.title;
+                        console.log(data.title);
+                        content.textContent = data.content;
+                    },
+                    error: function (req, status, err) {
+                        const res = req.responseJSON;
+
+                        if (res && res.message)
+                            alert(res.message);
+                    }
+                });
+            }
+
+            console.log(title.value);
+
+            $("#submit-btn").on("click", function () {
+
+                // 데이터
+                const titleValue = title.value;
+                const contentValue = content.value;
+
+                // 길이 검사
+                if (titleValue.length < 2) {
+                    alert("제목은 2자 이상 입력해주세요.");
+                    return;
+                }
+
+                if (contentValue.length < 10) {
+                    alert("내용은 10자 이상 입력해주세요.");
+                    return;
+                }
+
+                if (isEditing) {
+                    $.ajax({
+                        url: root + `/posts/${postId}`,
+                        method: 'put',
+                        dataType: 'json',
+                        data: {
+                            title: titleValue,
+                            content: contentValue,
+                        },
+                        success: function (data) {
+                            alert("글이 수정되었습니다.");
+                            window.location.replace(`./detail.html?id=${postId}`);
+                        },
+                        error: function (req, status, err) {
+                            const res = req.responseJSON;
+
+                            if (res && res.message)
+                                alert(res.message);
+                        }
+                    });
+                } else {
+                    $.ajax({
+                        url: root + '/posts',
+                        method: 'post',
+                        dataType: 'json',
+                        data: {
+                            title: titleValue,
+                            content: contentValue,
+                        },
+                        success: function (data) {
+                            alert("글이 작성되었습니다.");
+                            window.location.replace(`./detail.html?id=${data.id}`);
+                        },
+                        error: function (req, status, err) {
+                            const res = req.responseJSON;
+
+                            if (res && res.message)
+                                alert(res.message);
+                        }
+                    });
+                }
+
+            })
+        })
+    </script>
+</head>
+
+<body>
+    <header>
+        <h1 id="my-title"><a href="./index.html">게시판</a></h1>
+        <ul>
+            <li><a href="./signup.html">회원가입</a></li>
+            <li><a href="./login.html">로그인</a></li>
+        </ul>
+    </header>
+    <div id="post-container">
+        <div id="post-header">
+            <input type="text" id="title" placeholder="제목">
+        </div>
+        <div id="post-content">
+            <textarea id="content" placeholder="내용"></textarea>
+        </div>
+        <div id="submit">
+            <button type="submit" id="submit-btn">제출</button>
+        </div>
+    </div>
+</body>
+
+</html>

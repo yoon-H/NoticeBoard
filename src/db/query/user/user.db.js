@@ -10,3 +10,9 @@ export const findUserByLoginId = async (id) => {
 
   return row[0];
 };
+
+export const findUserById = async (id) => {
+  const [row] = await pool.query(SQL_USER_QUERIES.FIND_USER_BY_ID, [id]);
+
+  return row[0];
+};
