@@ -139,16 +139,20 @@
             const name = "authorization";
 
             let token;
+            let decodedToken;
 
-            for (let cookie of cookies) {
-                const [key, value] = cookie.trim().split('=');
-                if (key === name) {
-                    token = value;
-                    break;
-                };
+            if (cookies) {
+                for (let cookie of cookies) {
+                    const [key, value] = cookie.trim().split('=');
+                    if (key === name) {
+                        token = value;
+                        break;
+                    };
+                }
+
+                if (token)
+                    decodedToken = jwt_decode(token);
             }
-
-            const decodedToken = jwt_decode(token);
 
             // 글 element
             const title = document.getElementById("title");
@@ -213,6 +217,11 @@
 
             // 수정 버튼
             $("#edit-btn").on("click", function () {
+                if (!decodedToken) {
+                    alert("로그인을 해주세요.");
+                    return;
+                }
+
                 if (decodedToken.userId !== authorId) {
                     alert("작성자가 아닙니다.");
                     return;
@@ -231,6 +240,11 @@
 
             // 삭제 버튼
             $("#delete-btn").on("click", function () {
+                if (!decodedToken) {
+                    alert("로그인을 해주세요.");
+                    return;
+                }
+
                 if (decodedToken.userId !== authorId) {
                     alert("작성자가 아닙니다.");
                     return;
@@ -264,7 +278,6 @@
                     }
                 });
             })
-
         })
     </script>
 </head>
