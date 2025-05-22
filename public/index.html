@@ -114,13 +114,43 @@
         .post .author {
             flex-basis: 10%;
         }
+
+        #pages {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        #pages button {
+            border: none;
+            outline: none;
+
+            cursor: pointer;
+
+            background-color: white;
+        }
+
+        #pages button:hover {
+            text-decoration: underline;
+        }
     </style>
     <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
     <script>
-        $(document).ready(function () {
-            const root = 'http://localhost:3000/api';
+        function setColor(tag, flag) {
+            if (flag)
+                tag.css({ "background-color": rgb(255, 81, 81) });
+            else
+                tag.css({ "background-color": "white" });
+        }
+        const root = 'http://localhost:3000/api';
 
-            const info = document.getElementById("info");
+        let info;
+        let pages;
+        const groups = [];
+
+        $(document).ready(function () {
+            info = document.getElementById("post-container");
+            pages = document.getElementById("pages");
 
             $.ajax({
                 url: root + `/posts`,
@@ -128,8 +158,14 @@
                 success: function (data) {
                     if (!data) return;
 
-                    for (const post of data) {
-                        info.insertAdjacentHTML("afterend",
+                    data = data.reverse();
+
+                    for (let i = 0; i < data.length; i += 10) {
+                        groups.push(data.slice(i, i + 10));
+                    }
+
+                    for (const post of groups[0]) {
+                        info.insertAdjacentHTML("beforeend",
                             `<div class="post">
                                 <p class="number">${post.id}</p>
                                 <a href="./detail.html?id=${post.id}" class="title">${post.title}</a>
@@ -137,6 +173,16 @@
                             </div>`
                         );
                     }
+
+                    for (let i = 0; i < groups.length; i++) {
+                        pages.insertAdjacentHTML("afterbegin",
+                            `<div class="page">
+                                <button type="button" class="page-btn" data-id="${groups.length - i}">${groups.length - i}</button>
+                            </div>`
+                        );
+                    }
+
+
                 },
                 error: function (req, status, err) {
                     const res = req.responseJSON;
@@ -147,9 +193,30 @@
                     return;
                 }
             });
-
-
         })
+
+        // 페이지 클릭 이벤트
+        $(document).on("click", ".page-btn", function () {
+            const idx = Number($(this).data('id'));
+
+            if (isNaN(idx)) {
+                alert("숫자 형식이 아닙니다.");
+                return;
+            }
+
+            info.innerHTML = "";
+
+            for (const post of groups[idx - 1]) {
+                info.insertAdjacentHTML("beforeend",
+                    `<div class="post">
+                        <p class="number">${post.id}</p>
+                        <a href="./detail.html?id=${post.id}" class="title">${post.title}</a>
+                        <p class="author">${post.author}</p>
+                    </div>`
+                );
+            }
+        })
+
     </script>
 </head>
 
@@ -171,7 +238,12 @@
                 <p class="title">제목</p>
                 <p class="author">저자</p>
             </div>
+            <div id="post-container">
+
+            </div>
         </div>
+    </div>
+    <div id="pages">
     </div>
 </body>
 
