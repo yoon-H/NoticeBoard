@@ -10,7 +10,7 @@ const createPool = (db) => {
     user: db.user,
     password: db.password,
     database: db.name,
-    timezone: "Asia/Seoul",
+    timezone: "+09:00",
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
