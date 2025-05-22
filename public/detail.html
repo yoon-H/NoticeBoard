@@ -139,6 +139,25 @@
             height: 100px;
         }
 
+        #comment-pages {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        #pages button {
+            border: none;
+            outline: none;
+
+            cursor: pointer;
+
+            background-color: white;
+        }
+
+        #pages button:hover {
+            text-decoration: underline;
+        }
+
         #input-comment {
             border-bottom-color: rgb(255, 81, 81);
             border-bottom-width: 2px;
@@ -191,6 +210,11 @@
         const params = new URLSearchParams(window.location.search);
         const postId = params.get("id");
         let postAuthorId;
+
+        // 댓글 페이지네이션
+        let pages;
+        const groups = [];
+        let commentContainer;
 
         function checkToken(token, authorId = null) {
             if (!token) {
@@ -267,7 +291,9 @@
             });
 
             // 코멘트 조회
-            const commentContainer = document.getElementById("comment-container");
+            commentContainer = document.getElementById("comment-container");
+
+            pages = document.getElementById("comment-pages");
 
             $.ajax({
                 url: root + `/posts/${postId}/comments`,
@@ -275,9 +301,18 @@
                 success: function (data) {
                     if (!data) return;
 
-                    for (const comment of data) {
-                        console.log(comment);
-                        commentContainer.insertAdjacentHTML("afterbegin",
+                    data = data.reverse();
+
+                    for (let i = 0; i < data.length; i += 10) {
+                        groups.push(data.slice(i, i + 10));
+                    }
+
+                    console.log(groups);
+
+                    if (groups.length <= 0) return;
+
+                    for (const comment of groups[0]) {
+                        commentContainer.insertAdjacentHTML("beforeend",
                             `<div class="comment" data-comment-id="${comment.id}" data-author-id="${comment.authorId}">
                                 <div class="comment-header">
                                     <div class="comment-info">
@@ -292,6 +327,14 @@
                                 <div class="comment-content">
                                     <p class="content">${comment.content}</p>
                                 </div>
+                            </div>`
+                        );
+                    }
+
+                    for (let i = 0; i < groups.length; i++) {
+                        pages.insertAdjacentHTML("afterbegin",
+                            `<div class="page">
+                                <button type="button" class="page-btn" data-id="${groups.length - i}">${groups.length - i}</button>
                             </div>`
                         );
                     }
@@ -512,6 +555,37 @@
             });
         })
 
+        // 페이지 버튼
+        $(document).on("click", ".page-btn", function () {
+            const idx = Number($(this).data('id'));
+
+            if (isNaN(idx)) {
+                alert("숫자 형식이 아닙니다.");
+                return;
+            }
+
+            commentContainer.innerHTML = "";
+
+            for (const comment of groups[idx - 1]) {
+                commentContainer.insertAdjacentHTML("beforeend",
+                    `<div class="comment" data-comment-id="${comment.id}" data-author-id="${comment.authorId}">
+                                <div class="comment-header">
+                                    <div class="comment-info">
+                                        <p class="author">${comment.author}</p>
+                                        <p class="time" class="comment-time">${comment.time}</p>
+                                    </div>
+                                    <div class="comment-btns">
+                                        <button type="button" class="comment-edit-btn">수정</button>
+                                        <button type="button" class="comment-delete-btn">삭제</button>
+                                    </div>
+                                </div>
+                                <div class="comment-content">
+                                    <p class="content">${comment.content}</p>
+                                </div>
+                            </div>`
+                );
+            }
+        })
     </script>
 </head>
 
@@ -540,8 +614,6 @@
                 글 내용
             </p>
         </div>
-        <div id="comment-container">
-        </div>
         <div id="input-comment">
             <div id="input-content">
                 <textarea id="content" placeholder="내용"></textarea>
@@ -550,6 +622,12 @@
                 <button type="submit" id="submit-btn">제출</button>
             </div>
         </div>
+        <div id="comment-container">
+        </div>
+        <div id="comment-pages">
+
+        </div>
+
     </div>
 </body>
 
