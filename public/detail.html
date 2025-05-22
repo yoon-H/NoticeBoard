@@ -122,6 +122,47 @@
             display: flex;
             gap: 10px;
         }
+
+        #input-comment {
+            border-bottom-color: rgb(255, 81, 81);
+            border-bottom-width: 2px;
+            border-bottom-style: solid;
+        }
+
+        #comment-content {
+            margin: 10px;
+        }
+
+        #comment-content textarea {
+            resize: none;
+
+            width: 100%;
+            height: 100px;
+        }
+
+        #submit {
+            display: flex;
+            justify-content: flex-end;
+
+            margin: 5px;
+        }
+
+        #submit-btn {
+            border: none;
+            border-radius: 5px;
+            background-color: rgb(255, 81, 81);
+
+            width: 60px;
+            margin-top: 5px;
+            font-size: 16px;
+            color: white;
+
+            cursor: pointer;
+        }
+
+        #submit-btn:hover {
+            background-color: crimson;
+        }
     </style>
     <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
     <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
@@ -278,6 +319,34 @@
                     }
                 });
             })
+
+            // 댓글 제출 버튼
+            $("#submit-btn").on("click", function () {
+                const commentContent = document.getElementById("content");
+
+                $.ajax({
+                    url: root + `/posts/${postId}/comments`,
+                    method: 'post',
+                    dataType: 'json',
+                    data: {
+                        content: commentContent.value,
+                    },
+                    success: function (data) {
+                        if (data && data.message)
+                            alert(data.message);
+
+                        window.location.replace(`./detail.html?id=${postId}`);
+                    },
+                    error: function (req, status, err) {
+                        const res = req.responseJSON;
+
+                        if (res && res.message)
+                            alert(res.message);
+
+                        return;
+                    }
+                });
+            })
         })
     </script>
 </head>
@@ -317,7 +386,12 @@
             </div>
         </div>
         <div id="input-comment">
-
+            <div id="comment-content">
+                <textarea id="content" placeholder="내용"></textarea>
+            </div>
+            <div id="submit">
+                <button type="submit" id="submit-btn">제출</button>
+            </div>
         </div>
     </div>
 </body>
