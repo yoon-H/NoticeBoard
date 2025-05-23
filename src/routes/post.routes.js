@@ -105,7 +105,9 @@ router.post("/posts", authMiddleware, async (req, res, next) => {
     if (!title || !author || !content)
       return res.status(400).json({ message: "요소를 전부 입력해주세요." });
 
-    const result = await createPost(title, author, content);
+    const obj = { title, author, content };
+
+    const result = await createPost(obj);
 
     return res
       .status(201)
@@ -233,7 +235,14 @@ router.put("/posts/:postId", authMiddleware, async (req, res, next) => {
     if (!title || !author || !content)
       return res.status(400).json({ message: "요소를 전부 입력해주세요." });
 
-    const result = await editPost(title, content, postId, author);
+    const obj = {
+      title,
+      content,
+      id: postId,
+      author,
+    };
+
+    const result = await editPost(obj);
 
     if (result.affectedRows === 0)
       return res
@@ -295,7 +304,12 @@ router.delete("/posts/:postId", authMiddleware, async (req, res, next) => {
     if (isNaN(postId))
       return res.status(400).json({ message: "자료형을 확인해주세요." });
 
-    const result = await deletePost(postId, author);
+    const obj = {
+      id: postId,
+      author,
+    };
+
+    const result = await deletePost(obj);
 
     if (result.affectedRows === 0)
       return res

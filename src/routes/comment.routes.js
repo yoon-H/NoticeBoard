@@ -139,7 +139,9 @@ router.post(
       if (!author || !content)
         return res.status(400).json({ message: "모든 요소를 작성해주세요." });
 
-      await createComment(author, content, postId);
+      const obj = { author, content, postId };
+
+      await createComment(obj);
 
       return res.status(201).json({ message: "댓글이 저장되었습니다." });
     } catch (err) {
@@ -202,7 +204,13 @@ router.put("/comments/:commentId", authMiddleware, async (req, res, next) => {
     if (!author || !content)
       return res.status(400).json({ message: "모든 요소를 작성해주세요." });
 
-    const result = await editComment(commentId, content, author);
+    const obj = {
+      id: commentId,
+      content,
+      author,
+    };
+
+    const result = await editComment(obj);
 
     if (result.affectedRows === 0)
       return res
@@ -272,7 +280,9 @@ router.delete(
       if (!author)
         return res.status(400).json({ message: "모든 요소를 작성해주세요." });
 
-      const result = await deleteComment(commentId, author);
+      const obj = { id: commentId, author };
+
+      const result = await deleteComment(obj);
 
       if (result.affectedRows === 0)
         return res

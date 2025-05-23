@@ -73,8 +73,14 @@ router.post("/auth/signup", async (req, res, next) => {
     // 비밀번호 해싱
     const hashedPw = await bcrypt.hash(password, 10);
 
+    const obj = {
+      name,
+      id,
+      password: hashedPw,
+    };
+
     // 데이터 저장
-    await createUser(name, id, hashedPw);
+    await createUser(obj);
     return res.status(201).json({ message: "회원가입이 완료되었습니다." });
   } catch (err) {
     next(err);

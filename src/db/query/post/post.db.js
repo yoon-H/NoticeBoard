@@ -7,7 +7,7 @@ export const getAllPosts = async () => {
   return rows;
 };
 
-export const createPost = async (title, author, content) => {
+export const createPost = async ({ title, author, content }) => {
   const [row] = await pool.query(SQL_POST_QUERIES.CREATE_POST, [
     title,
     author,
@@ -23,7 +23,7 @@ export const getPost = async (id) => {
   return row[0];
 };
 
-export const editPost = async (title, content, id, author) => {
+export const editPost = async ({ title, content, id, author }) => {
   const [row] = await pool.query(SQL_POST_QUERIES.EDIT_POST, [
     title,
     content,
@@ -34,7 +34,7 @@ export const editPost = async (title, content, id, author) => {
   return row;
 };
 
-export const deletePost = async (id, author) => {
+export const deletePost = async ({ id, author }) => {
   const [row] = await pool.query(SQL_POST_QUERIES.DELETE_POST, [id, author]);
 
   return row;

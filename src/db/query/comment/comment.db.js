@@ -7,7 +7,7 @@ export const getComments = async (postId) => {
   return rows;
 };
 
-export const createComment = async (author, content, postId) => {
+export const createComment = async ({author, content, postId}) => {
   await pool.query(SQL_COMMENT_QUERIES.CREATE_COMMENT, [
     author,
     content,
@@ -15,7 +15,7 @@ export const createComment = async (author, content, postId) => {
   ]);
 };
 
-export const editComment = async (id, content, author) => {
+export const editComment = async ({id, content, author}) => {
   const [row] = await pool.query(SQL_COMMENT_QUERIES.EDIT_COMMENT, [
     content,
     id,
@@ -25,7 +25,7 @@ export const editComment = async (id, content, author) => {
   return row;
 };
 
-export const deleteComment = async (id, author) => {
+export const deleteComment = async ({id, author}) => {
   const [row] = await pool.query(SQL_COMMENT_QUERIES.DELETE_COMMENT, [
     id,
     author,
