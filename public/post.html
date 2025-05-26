@@ -147,9 +147,7 @@
                     url: `./api/posts/${postId}`,
                     method: 'get',
                     success: function (data) {
-                        console.log(data);
                         title.value = data.title;
-                        console.log(data.title);
                         content.textContent = data.content;
                     },
                     error: function (req, status, err) {
@@ -160,8 +158,6 @@
                     }
                 });
             }
-
-            console.log(title.value);
 
             $("#submit-btn").on("click", function () {
 

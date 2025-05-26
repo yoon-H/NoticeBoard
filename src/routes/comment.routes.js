@@ -209,7 +209,7 @@ router.put("/comments/:commentId", authMiddleware, async (req, res, next) => {
     const time = await getUpdateTime(commentId);
 
     return res.status(200).json({
-      time: time,
+      time: time.time,
       message: "댓글이 수정되었습니다.",
     });
   } catch (err) {

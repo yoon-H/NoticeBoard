@@ -242,21 +242,20 @@
         }
 
         function formatDate(date) {
-            return date.toLocaleString("ko-KR", {
+            return new Date(date).toLocaleString("ko-KR", {
                 timeZone: "Asia/Seoul",
             });
         }
 
         function getEffectiveDate(createDate, updateDate) {
-            const create = new Date(createDate);
-            const update = new Date(updateDate);
+            const create = formatDate(createDate);
+            const update = formatDate(updateDate);
 
-            const isEdited = create === update;
+            const isEdited = create < update;
 
-            return create === update ? formatDate(create) : formatDate(update) + '(수정됨)';
+            return create < update ?
+                update + '(수정됨)' : create;
         }
-
-
 
         $(document).ready(function () {
             // 토큰 가져오기
@@ -493,7 +492,8 @@
                     const commentBtns = rootComment.find('.comment-btns');
                     const contentBlock = rootComment.find('.comment-content');
                     const authorBlock = rootComment.find('.time');
-                    authorBlock.text(data.time);
+
+                    authorBlock.text(formatDate(data.time) + '(수정됨)');
 
                     commentBtns.empty().append(`<button type="button" class="comment-edit-btn">수정</button>
                         <button type="button" class="comment-delete-btn">삭제</button>`)
