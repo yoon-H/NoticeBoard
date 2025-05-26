@@ -144,7 +144,7 @@
 
             if (isEditing) {
                 $.ajax({
-                    url: root + `/posts/${postId}`,
+                    url: `./api/posts/${postId}`,
                     method: 'get',
                     success: function (data) {
                         console.log(data);
@@ -182,7 +182,7 @@
 
                 if (isEditing) {
                     $.ajax({
-                        url: root + `/posts/${postId}`,
+                        url: `./api/posts/${postId}`,
                         method: 'put',
                         dataType: 'json',
                         data: {
@@ -202,7 +202,7 @@
                     });
                 } else {
                     $.ajax({
-                        url: root + '/posts',
+                        url: './api/posts',
                         method: 'post',
                         dataType: 'json',
                         data: {

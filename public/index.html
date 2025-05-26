@@ -147,7 +147,7 @@
             pages = document.getElementById("pages");
 
             $.ajax({
-                url: root + `/posts`,
+                url: `./api/posts`,
                 method: 'get',
                 success: function (data) {
                     if (!data) return;

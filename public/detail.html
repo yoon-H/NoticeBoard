@@ -284,7 +284,7 @@
 
             // 글 조회
             $.ajax({
-                url: root + `/posts/${postId}`,
+                url: `./api/posts/${postId}`,
                 method: 'get',
                 success: function (data) {
                     if (!data) return;
@@ -312,7 +312,7 @@
             pages = document.getElementById("comment-pages");
 
             $.ajax({
-                url: root + `/posts/${postId}/comments`,
+                url: `./api/posts/${postId}/comments`,
                 method: 'get',
                 success: function (data) {
                     if (!data) return;
@@ -374,7 +374,7 @@
                 const commentContent = document.getElementById("content");
 
                 $.ajax({
-                    url: root + `/posts/${postId}/comments`,
+                    url: `./api/posts/${postId}/comments`,
                     method: 'post',
                     dataType: 'json',
                     data: {
@@ -413,7 +413,7 @@
                 return;
 
             $.ajax({
-                url: root + `/posts/${postId}`,
+                url: `./api/posts/${postId}`,
                 method: 'delete',
                 success: function (data) {
                     if (data && data.message)
@@ -480,7 +480,7 @@
             console.log("newContent : ", newContent);
 
             $.ajax({
-                url: root + `/comments/${commentId}`,
+                url: `./api/comments/${commentId}`,
                 method: 'put',
                 dataType: 'json',
                 data: {
@@ -553,7 +553,7 @@
                 return;
 
             $.ajax({
-                url: root + `/comments/${commentId}`,
+                url: `./api/comments/${commentId}`,
                 method: 'delete',
                 success: function (data) {
                     if (data && data.message)
