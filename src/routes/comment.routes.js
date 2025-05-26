@@ -8,6 +8,7 @@ import {
 } from "../db/query/comment/comment.db.js";
 import { formatDate } from "../utils/dateformatter.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
+import { getPost } from "../db/query/post/post.db.js";
 
 const router = Router();
 /**
@@ -56,25 +57,14 @@ router.get("/posts/:postId/comments", async (req, res, next) => {
     if (isNaN(postId))
       return res.status(400).json({ message: "자료형을 확인해주세요." });
 
-    const result = await getComments(postId);
+    const post = await getPost(postId);
 
-    if (result.length === 0)
+    if (!post)
       return res
         .status(404)
         .json({ message: "해당 게시글이 존재하지 않습니다." });
 
-    const comments = [];
-    for (const row of result) {
-      if (row.id === null) continue;
-
-      comments.push({
-        id: row.id,
-        author: row.author,
-        authorId: row.authorId,
-        content: row.content,
-        time: formatDate(row.createTime, row.updateTime),
-      });
-    }
+    const comments = await getComments(postId);
 
     return res.status(200).json(comments);
   } catch (err) {
