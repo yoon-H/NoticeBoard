@@ -7,7 +7,6 @@ import {
   getPost,
 } from "../db/query/post/post.db.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
-import { formatDate } from "../utils/dateformatter.js";
 
 const router = Router();
 
@@ -47,10 +46,6 @@ const router = Router();
 router.get("/posts", async (req, res, next) => {
   try {
     const posts = await getAllPosts();
-
-    for (const post of posts) {
-      post.time = formatDate(post.createTime, post.updateTime);
-    }
 
     return res.status(200).json(posts);
   } catch (err) {
@@ -168,8 +163,6 @@ router.get("/posts/:postId", async (req, res, next) => {
       return res
         .status(404)
         .json({ message: "해당 게시글이 존재하지 않습니다." });
-
-    post.time = formatDate(post.createTime, post.updateTime);
 
     return res.status(200).json(post);
   } catch (err) {

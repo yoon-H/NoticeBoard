@@ -6,7 +6,6 @@ import {
   deleteComment,
   getUpdateTime,
 } from "../db/query/comment/comment.db.js";
-import { formatDate } from "../utils/dateformatter.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
 import { getPost } from "../db/query/post/post.db.js";
 
@@ -210,7 +209,7 @@ router.put("/comments/:commentId", authMiddleware, async (req, res, next) => {
     const time = await getUpdateTime(commentId);
 
     return res.status(200).json({
-      time: formatDate(null, time.time),
+      time: time,
       message: "댓글이 수정되었습니다.",
     });
   } catch (err) {
