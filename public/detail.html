@@ -241,6 +241,22 @@
             return true;
         }
 
+        function formatDate(date) {
+            return date.toLocaleString("ko-KR", {
+                timeZone: "Asia/Seoul",
+            });
+        }
+
+        function getEffectiveDate(createDate, updateDate) {
+            const create = new Date(createDate);
+            const update = new Date(updateDate);
+
+            const isEdited = create === update;
+
+            return create === update ? formatDate(create) : formatDate(update) + '(수정됨)';
+        }
+
+
 
         $(document).ready(function () {
             // 토큰 가져오기
@@ -274,9 +290,9 @@
                     if (!data) return;
 
                     title.textContent = data.title;
-                    postTime.textContent = data.time;
                     author.textContent = data.author;
                     content.textContent = data.content;
+                    postTime.textContent = getEffectiveDate(data.createTime, data.updateTime);
 
                     postAuthorId = data.userId;
                 },
@@ -307,17 +323,18 @@
                         groups.push(data.slice(i, i + 10));
                     }
 
-                    console.log(groups);
-
                     if (groups.length <= 0) return;
 
                     for (const comment of groups[0]) {
+
+                        const commentTime = getEffectiveDate(comment.createTime, comment.updateTime);
+
                         commentContainer.insertAdjacentHTML("beforeend",
                             `<div class="comment" data-comment-id="${comment.id}" data-author-id="${comment.authorId}">
                                 <div class="comment-header">
                                     <div class="comment-info">
                                         <p class="author">${comment.author}</p>
-                                        <p class="time" class="comment-time">${comment.time}</p>
+                                        <p class="time" class="comment-time">${commentTime}</p>
                                     </div>
                                     <div class="comment-btns">
                                         <button type="button" class="comment-edit-btn">수정</button>
