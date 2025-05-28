@@ -6,7 +6,7 @@ const SQL_POST_QUERIES = {
     "SELECT p.id AS id, p.title AS title, u.id AS userId, u.name AS author, p.content AS content, p.create_dt AS createTime, p.update_dt AS updateTime, p.is_deleted AS isDeleted FROM posts AS p LEFT JOIN users AS u ON p.author = u.id WHERE p.id = ?;",
   EDIT_POST:
     "UPDATE posts SET title = ?, content = ? WHERE id = ? AND author = ?",
-  DELETE_POST: "DELETE FROM posts WHERE id = ? AND author =?",
+  DELETE_POST: "UPDATE posts SET is_deleted = TRUE WHERE id = ? AND author =?",
 };
 
 export default SQL_POST_QUERIES;
