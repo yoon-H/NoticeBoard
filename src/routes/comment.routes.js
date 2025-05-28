@@ -9,6 +9,7 @@ import {
 } from "../db/query/comment/comment.db.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
 import { getPost } from "../db/query/post/post.db.js";
+import { sanitizeComment } from "../utils/sanitizeContent.js";
 
 const router = Router();
 /**
@@ -141,7 +142,7 @@ router.post(
           .status(404)
           .json({ deletedCode: "post", message: "삭제된 게시글입니다." });
 
-      const obj = { author, content, postId };
+      const obj = { author, content: sanitizeComment(content), postId };
 
       await createComment(obj);
 
@@ -236,7 +237,7 @@ router.put("/comments/:commentId", authMiddleware, async (req, res, next) => {
 
     const obj = {
       id: commentId,
-      content,
+      content: sanitizeComment(content),
       author,
     };
 

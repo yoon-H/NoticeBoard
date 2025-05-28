@@ -7,6 +7,7 @@ import {
   getPost,
 } from "../db/query/post/post.db.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
+import { sanitizePost } from "../utils/sanitizeContent.js";
 
 const router = Router();
 
@@ -102,7 +103,7 @@ router.post("/posts", authMiddleware, async (req, res, next) => {
     if (!title || !author || !content)
       return res.status(400).json({ message: "요소를 전부 입력해주세요." });
 
-    const obj = { title, author, content };
+    const obj = { title, author, content: sanitizePost(content) };
 
     const result = await createPost(obj);
 
@@ -250,7 +251,7 @@ router.put("/posts/:postId", authMiddleware, async (req, res, next) => {
 
     const obj = {
       title,
-      content,
+      content: sanitizePost(content),
       id: postId,
       author,
     };
