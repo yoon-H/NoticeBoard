@@ -164,6 +164,9 @@ router.get("/posts/:postId", async (req, res, next) => {
         .status(404)
         .json({ message: "해당 게시글이 존재하지 않습니다." });
 
+    if (post.isDeleted)
+      return res.status(404).json({ message: "게시글이 삭제되었습니다." });
+
     return res.status(200).json(post);
   } catch (err) {
     next(err);
@@ -228,6 +231,17 @@ router.put("/posts/:postId", authMiddleware, async (req, res, next) => {
     if (!title || !author || !content)
       return res.status(400).json({ message: "요소를 전부 입력해주세요." });
 
+    const post = await getPost(postId);
+
+    if (!post) {
+      return res
+        .status(404)
+        .json({ message: "해당 게시글이 존재하지 않습니다." });
+    }
+
+    if (post.isDeleted)
+      return res.status(404).json({ message: "게시글이 삭제되었습니다." });
+
     const obj = {
       title,
       content,
@@ -237,10 +251,10 @@ router.put("/posts/:postId", authMiddleware, async (req, res, next) => {
 
     const result = await editPost(obj);
 
-    if (result.affectedRows === 0)
-      return res
-        .status(404)
-        .json({ message: "해당 게시글이 존재하지 않습니다." });
+    // if (result.affectedRows === 0)
+    //   return res
+    //     .status(404)
+    //     .json({ message: "해당 게시글이 존재하지 않습니다." });
 
     return res.status(200).json({ message: "게시글이 수정되었습니다." });
   } catch (err) {
@@ -296,6 +310,17 @@ router.delete("/posts/:postId", authMiddleware, async (req, res, next) => {
 
     if (isNaN(postId))
       return res.status(400).json({ message: "자료형을 확인해주세요." });
+
+    const post = await getPost(postId);
+
+    if (!post) {
+      return res
+        .status(404)
+        .json({ message: "해당 게시글이 존재하지 않습니다." });
+    }
+
+    if (post.isDeleted)
+      return res.status(404).json({ message: "게시글이 삭제되었습니다." });
 
     const obj = {
       id: postId,
