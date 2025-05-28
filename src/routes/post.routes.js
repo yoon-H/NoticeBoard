@@ -251,10 +251,8 @@ router.put("/posts/:postId", authMiddleware, async (req, res, next) => {
 
     const result = await editPost(obj);
 
-    // if (result.affectedRows === 0)
-    //   return res
-    //     .status(404)
-    //     .json({ message: "해당 게시글이 존재하지 않습니다." });
+    if (result.changedRows === 0)
+      return res.status(500).json({ message: "게시글 수정에 실패했습니다." });
 
     return res.status(200).json({ message: "게시글이 수정되었습니다." });
   } catch (err) {
@@ -331,11 +329,6 @@ router.delete("/posts/:postId", authMiddleware, async (req, res, next) => {
 
     if (result) res.status(200).json({ message: "게시글이 삭제되었습니다." });
     else res.status(500).json({ message: "게시글 삭제에 실패했습니다." });
-
-    // if (result.affectedRows === 0)
-    //   return res
-    //     .status(404)
-    //     .json({ message: "해당 게시글이 존재하지 않습니다." });
   } catch (err) {
     next(err);
   }

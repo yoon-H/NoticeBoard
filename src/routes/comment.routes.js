@@ -5,6 +5,7 @@ import {
   editComment,
   deleteComment,
   getUpdateTime,
+  getComment,
 } from "../db/query/comment/comment.db.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
 import { getPost } from "../db/query/post/post.db.js";
@@ -128,6 +129,16 @@ router.post(
       if (!author || !content)
         return res.status(400).json({ message: "모든 요소를 작성해주세요." });
 
+      const post = await getPost(postId);
+
+      if (!post)
+        return res
+          .status(404)
+          .json({ message: "해당 게시글이 존재하지 않습니다." });
+
+      if (post.isDeleted)
+        return res.status(404).json({ message: "삭제된 게시글입니다." });
+
       const obj = { author, content, postId };
 
       await createComment(obj);
@@ -193,18 +204,40 @@ router.put("/comments/:commentId", authMiddleware, async (req, res, next) => {
     if (!author || !content)
       return res.status(400).json({ message: "모든 요소를 작성해주세요." });
 
+    const comment = await getComment(commentId);
+
+    if (!comment)
+      return res
+        .status(404)
+        .json({ message: "해당 댓글이 존재하지 않습니다." });
+
+    if (comment.author !== author)
+      return res.status(403).json({ message: "작성자가 아닙니다." });
+
+    if (comment.isDeleted) {
+      const post = await getPost(comment.postId);
+
+      if (!post)
+        return res
+          .status(404)
+          .json({ message: "해당 게시글이 존재하지 않습니다." });
+
+      if (post.isDeleted)
+        return res.status(404).json({ message: "삭제된 게시글입니다." });
+
+      return res.status(404).json({ message: "삭제된 댓글입니다." });
+    }
+
     const obj = {
       id: commentId,
       content,
       author,
     };
 
-    const result = await editComment(obj);
+    await editComment(obj);
 
-    if (result.affectedRows === 0)
-      return res
-        .status(404)
-        .json({ message: "해당 댓글이 존재하지 않습니다." });
+    if (result.changedRows === 0)
+      return res.status(500).json({ message: "댓글 수정에 실패했습니다." });
 
     const time = await getUpdateTime(commentId);
 
@@ -269,14 +302,37 @@ router.delete(
       if (!author)
         return res.status(400).json({ message: "모든 요소를 작성해주세요." });
 
+      // 댓글 및 게시글 검사
+      const comment = await getComment(commentId);
+
+      if (!comment)
+        return res
+          .status(404)
+          .json({ message: "해당 댓글이 존재하지 않습니다." });
+
+      if (comment.author !== author)
+        return res.status(403).json({ message: "작성자가 아닙니다." });
+
+      if (comment.isDeleted) {
+        const post = await getPost(comment.postId);
+
+        if (!post)
+          return res
+            .status(404)
+            .json({ message: "해당 게시글이 존재하지 않습니다." });
+
+        if (post.isDeleted)
+          return res.status(404).json({ message: "삭제된 게시글입니다." });
+
+        return res.status(404).json({ message: "삭제된 댓글입니다." });
+      }
+
       const obj = { id: commentId, author };
 
       const result = await deleteComment(obj);
 
-      if (result.affectedRows === 0)
-        return res
-          .status(404)
-          .json({ message: "해당 댓글이 존재하지 않습니다." });
+      if (result.changedRows === 0)
+        return res.status(500).json({ message: "댓글 삭제에 실패했습니다." });
 
       return res.status(200).json({ message: "댓글이 삭제되었습니다." });
     } catch (err) {
