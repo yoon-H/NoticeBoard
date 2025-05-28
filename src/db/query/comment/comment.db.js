@@ -15,6 +15,12 @@ export const createComment = async ({ author, content, postId }) => {
   ]);
 };
 
+export const getComment = async (id) => {
+  const [row] = await pool.query(SQL_COMMENT_QUERIES.GET_COMMENT, [id]);
+
+  return row[0];
+};
+
 export const editComment = async ({ id, content, author }) => {
   const [row] = await pool.query(SQL_COMMENT_QUERIES.EDIT_COMMENT, [
     content,
