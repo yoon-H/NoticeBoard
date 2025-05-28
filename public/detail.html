@@ -290,7 +290,7 @@
 
                     title.textContent = data.title;
                     author.textContent = data.author;
-                    content.textContent = data.content;
+                    content.innerHTML = data.content;
                     postTime.textContent = getEffectiveDate(data.createTime, data.updateTime);
 
                     postAuthorId = data.userId;
