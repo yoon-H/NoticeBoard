@@ -4,7 +4,7 @@ const SQL_COMMENT_QUERIES = {
   CREATE_COMMENT:
     "INSERT INTO comments (author, content, post_id) VALUES (?,?,?)",
   GET_COMMENT:
-    "SELECT c.id AS id, c.post_id AS postId, author AS authorId, is_deleted AS isDeleted FROM comments WHERE c.id = ?",
+    "SELECT id, post_id AS postId, author AS authorId, is_deleted AS isDeleted FROM comments WHERE id = ?",
   EDIT_COMMENT: "UPDATE comments SET content = ? WHERE id = ? AND author = ?",
   DELETE_COMMENT:
     "UPDATE comments SET is_deleted = TRUE WHERE id = ? AND author = ?",
