@@ -165,7 +165,7 @@ router.get("/posts/:postId", async (req, res, next) => {
         .json({ message: "해당 게시글이 존재하지 않습니다." });
 
     if (post.isDeleted)
-      return res.status(404).json({ message: "게시글이 삭제되었습니다." });
+      return res.status(404).json({ message: "삭제된 게시글입니다." });
 
     return res.status(200).json(post);
   } catch (err) {
@@ -240,7 +240,7 @@ router.put("/posts/:postId", authMiddleware, async (req, res, next) => {
     }
 
     if (post.isDeleted)
-      return res.status(404).json({ message: "게시글이 삭제되었습니다." });
+      return res.status(404).json({ message: "삭제된 게시글입니다." });
 
     const obj = {
       title,
@@ -320,7 +320,7 @@ router.delete("/posts/:postId", authMiddleware, async (req, res, next) => {
     }
 
     if (post.isDeleted)
-      return res.status(404).json({ message: "게시글이 삭제되었습니다." });
+      return res.status(404).json({ message: "삭제된 게시글입니다." });
 
     const obj = {
       id: postId,
@@ -329,12 +329,13 @@ router.delete("/posts/:postId", authMiddleware, async (req, res, next) => {
 
     const result = await deletePost(obj);
 
-    if (result.affectedRows === 0)
-      return res
-        .status(404)
-        .json({ message: "해당 게시글이 존재하지 않습니다." });
+    if (result) res.status(200).json({ message: "게시글이 삭제되었습니다." });
+    else res.status(500).json({ message: "게시글 삭제에 실패했습니다." });
 
-    return res.status(200).json({ message: "게시글이 삭제되었습니다." });
+    // if (result.affectedRows === 0)
+    //   return res
+    //     .status(404)
+    //     .json({ message: "해당 게시글이 존재하지 않습니다." });
   } catch (err) {
     next(err);
   }
