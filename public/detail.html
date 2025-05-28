@@ -298,9 +298,22 @@
                 error: function (req, status, err) {
                     const res = req.responseJSON;
 
-                    if (res && res.message)
-                        alert(res.message);
+                    if (!res) return;
 
+                    if (res.message) {
+                        alert(res.message);
+                    }
+
+                    if (res.deletedCode) {
+                        switch (res.deletedCode) {
+                            case 'post':
+                                window.location.replace(`./index.html`);
+                                break;
+                            case 'comment':
+                                window.location.replace(`./detail.html?id=${postId}`);
+                                break;
+                        }
+                    }
                     return;
                 }
             });
@@ -388,8 +401,22 @@
                     error: function (req, status, err) {
                         const res = req.responseJSON;
 
-                        if (res && res.message)
+                        if (!res) return;
+
+                        if (res.message) {
                             alert(res.message);
+                        }
+
+                        if (res.deletedCode) {
+                            switch (res.deletedCode) {
+                                case 'post':
+                                    window.location.replace(`./index.html`);
+                                    break;
+                                case 'comment':
+                                    window.location.replace(`./detail.html?id=${postId}`);
+                                    break;
+                            }
+                        }
 
                         return;
                     }
@@ -423,8 +450,22 @@
                 error: function (req, status, err) {
                     const res = req.responseJSON;
 
-                    if (res && res.message)
+                    if (!res) return;
+
+                    if (res.message) {
                         alert(res.message);
+                    }
+
+                    if (res.deletedCode) {
+                        switch (res.deletedCode) {
+                            case 'post':
+                                window.location.replace(`./index.html`);
+                                break;
+                            case 'comment':
+                                window.location.replace(`./detail.html?id=${postId}`);
+                                break;
+                        }
+                    }
 
                     return;
                 }
@@ -502,8 +543,22 @@
                 error: function (req, status, err) {
                     const res = req.responseJSON;
 
-                    if (res && res.message)
+                    if (!res) return;
+
+                    if (res.message) {
                         alert(res.message);
+                    }
+
+                    if (res.deletedCode) {
+                        switch (res.deletedCode) {
+                            case 'post':
+                                window.location.replace(`./index.html`);
+                                break;
+                            case 'comment':
+                                window.location.replace(`./detail.html?id=${postId}`);
+                                break;
+                        }
+                    }
 
                     return;
                 }
@@ -564,8 +619,22 @@
                 error: function (req, status, err) {
                     const res = req.responseJSON;
 
-                    if (res && res.message)
+                    if (!res) return;
+
+                    if (res.message) {
                         alert(res.message);
+                    }
+
+                    if (res.deletedCode) {
+                        switch (res.deletedCode) {
+                            case 'post':
+                                window.location.replace(`./index.html`);
+                                break;
+                            case 'comment':
+                                window.location.replace(`./detail.html?id=${postId}`);
+                                break;
+                        }
+                    }
 
                     return;
                 }
