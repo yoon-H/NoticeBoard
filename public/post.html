@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>글쓰기</title>
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
     <style>
         header {
             display: flex;
@@ -92,6 +93,7 @@
         }
 
         #post-content {
+            padding-bottom: 5px;
             border-bottom-color: rgb(255, 81, 81);
             border-bottom-width: 2px;
             border-bottom-style: solid;
@@ -130,7 +132,37 @@
         }
     </style>
     <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
     <script>
+        function imageHandler() {
+            const input = document.createElement('input');
+            input.setAttribute('type', 'file'); // 파일 선택창으로 변경
+            input.setAttribute('accept', 'image/*'); // 이미지 파일 제한
+            input.click(); // 동작시켜서 파일 선택창으로 변경
+
+            input.onchange = async () => { // 파일을 선택했을 때
+                const file = input.files[0];
+                const formData = new FormData(); // 이미지 파일로 보내기 위해 서버에 보낼 객체 생성
+                formData.append('image', file); // 파일 담기
+
+                $.ajax({
+                    url: '/api/upload/image',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,   // 중요! FormData는 jQuery가 가공하지 않게
+                    contentType: false,   // 중요! FormData는 content-type 자동 설정
+                    success: function (data) {
+                        const range = quill.getSelection(); // 현재 커서 위치 가져오기
+                        quill.insertEmbed(range.index, 'image', data.imageUrl); // 서버에서 받은 url 넘기기
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('이미지 업로드 실패:', error);
+                        alert('이미지 업로드에 실패했습니다.');
+                    }
+                });
+            };
+        }
+
         $(document).ready(function () {
             const root = 'http://localhost:3000/api';
 
@@ -141,6 +173,23 @@
 
             const title = document.getElementById("title");
             const content = document.getElementById("content");
+
+            // 글 작성 에디터
+            const quill = new Quill('#editor', {
+                theme: 'snow',
+                modules: {
+                    toolbar: [
+                        ['image'],
+                        [{ header: [1, 2, 3, false] }],
+                        ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+                    ]
+                }
+
+            });
+
+            quill.getModule('toolbar').addHandler('image', () => {
+                imageHandler();
+            });
 
             if (isEditing) {
                 $.ajax({
@@ -250,7 +299,7 @@
             <input type="text" id="title" placeholder="제목">
         </div>
         <div id="post-content">
-            <textarea id="content" placeholder="내용"></textarea>
+            <div id="editor"></div>
         </div>
         <div id="submit">
             <button type="submit" id="submit-btn">제출</button>
