@@ -197,7 +197,7 @@
                     method: 'get',
                     success: function (data) {
                         title.value = data.title;
-                        content.textContent = data.content;
+                        quill.root.innerHTML = data.content;
                     },
                     error: function (req, status, err) {
                         const res = req.responseJSON;
