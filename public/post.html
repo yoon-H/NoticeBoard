@@ -134,7 +134,7 @@
     <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
     <script>
-        function imageHandler() {
+        function imageHandler(quill) {
             const input = document.createElement('input');
             input.setAttribute('type', 'file'); // 파일 선택창으로 변경
             input.setAttribute('accept', 'image/*'); // 이미지 파일 제한
@@ -155,7 +155,7 @@
                         const range = quill.getSelection(); // 현재 커서 위치 가져오기
                         quill.insertEmbed(range.index, 'image', data.imageUrl); // 서버에서 받은 url 넘기기
                     },
-                    error: function (xhr, status, error) {
+                    error: function (req, status, error) {
                         console.error('이미지 업로드 실패:', error);
                         alert('이미지 업로드에 실패했습니다.');
                     }
@@ -188,7 +188,7 @@
             });
 
             quill.getModule('toolbar').addHandler('image', () => {
-                imageHandler();
+                imageHandler(quill);
             });
 
             if (isEditing) {
