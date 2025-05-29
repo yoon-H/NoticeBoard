@@ -108,7 +108,7 @@ router.post("/posts", authMiddleware, async (req, res, next) => {
     // 트랜잭션
     const result = await createPostWithImages(obj);
 
-    if (result)
+    if (!result.insertId)
       return res
         .status(201)
         .json({ id: result.insertId, message: "게시글이 저장되었습니다." });

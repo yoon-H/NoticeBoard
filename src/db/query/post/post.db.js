@@ -22,7 +22,7 @@ export const createPostWithImages = async ({ title, author, content }) => {
   const tran = await pool.getConnection();
   await tran.beginTransaction();
 
-  let result = false;
+  let result = {};
 
   if (tran) {
     try {
@@ -61,7 +61,7 @@ export const createPostWithImages = async ({ title, author, content }) => {
       }
       await tran.commit();
 
-      result = true;
+      result.insertId = postId;
     } catch (err) {
       console.error(`Transaction error : ${err.message}`);
       await tran.rollback();
@@ -102,6 +102,8 @@ export const deletePost = async ({ id, author }) => {
     try {
       await tran.query(SQL_POST_QUERIES.DELETE_POST, [id, author]);
       await tran.query(SQL_COMMENT_QUERIES.DELETE_COMMENTS_BY_POST_ID, [id]);
+      await tran.query(SQL_IMAGE_QUERIES.SOFT_DELETE_IMAGES, [id]);
+
       await tran.commit();
 
       result = true;

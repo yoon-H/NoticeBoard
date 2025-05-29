@@ -7,8 +7,8 @@ const SQL_IMAGE_QUERIES = {
     "INSERT INTO images (user_id, stored_name, url) VALUES (?,?,?)",
   SAVE_IMAGE: "UPDATE images SET post_id = ?, is_temp = FALSE WHERE id = ?",
   DELETE_TEMP_IMAGE: "DELETE FROM images WHERE id = ? AND is_temp = TRUE",
-  SOFT_DELETE_IMAGE:
-    "UPDATE images SET is_deleted = TRUE, delete_dt = CURRENT_TIMESTAMP  WHERE id = ?",
+  SOFT_DELETE_IMAGES:
+    "UPDATE images SET is_deleted = TRUE, delete_dt = CURRENT_TIMESTAMP WHERE post_id = ?",
 };
 
 export default SQL_IMAGE_QUERIES;
