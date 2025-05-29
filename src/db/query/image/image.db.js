@@ -9,8 +9,12 @@ export const getImages = async (postId) => {
   return rows;
 };
 
-export const saveImage = async ({ postId, name, url }) => {
-  await pool.query(SQL_IMAGE_QUERIES.SAVE_IMAGE, [postId, name, url]);
+export const saveTempImage = async ({ userId, name, url }) => {
+  await pool.query(SQL_IMAGE_QUERIES.SAVE_TEMP_IMAGE, [userId, name, url]);
+};
+
+export const saveImage = async ({ postId, id }) => {
+  await pool.query(SQL_IMAGE_QUERIES.SAVE_IMAGE, [postId, id]);
 };
 
 export const softDeleteImage = async (id) => {
