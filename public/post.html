@@ -212,16 +212,11 @@
 
                 // 데이터
                 const titleValue = title.value;
-                const contentValue = content.value;
+                const contentValue = quill.root.innerHTML;
 
                 // 길이 검사
                 if (titleValue.length < 2) {
                     alert("제목은 2자 이상 입력해주세요.");
-                    return;
-                }
-
-                if (contentValue.length < 10) {
-                    alert("내용은 10자 이상 입력해주세요.");
                     return;
                 }
 

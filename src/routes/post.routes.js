@@ -1,6 +1,6 @@
 import { Router } from "express";
 import {
-  createPost,
+  createPostWithImages,
   deletePost,
   editPost,
   getAllPosts,
@@ -105,11 +105,15 @@ router.post("/posts", authMiddleware, async (req, res, next) => {
 
     const obj = { title, author, content: sanitizePost(content) };
 
-    const result = await createPost(obj);
+    // 트랜잭션
+    const result = await createPostWithImages(obj);
 
-    return res
-      .status(201)
-      .json({ id: result.insertId, message: "게시글이 저장되었습니다." });
+    if (result)
+      return res
+        .status(201)
+        .json({ id: result.insertId, message: "게시글이 저장되었습니다." });
+    else
+      return res.status(500).json({ message: "게시글 삭제에 실패했습니다." });
   } catch (err) {
     next(err);
   }
@@ -333,8 +337,10 @@ router.delete("/posts/:postId", authMiddleware, async (req, res, next) => {
 
     const result = await deletePost(obj);
 
-    if (result) res.status(200).json({ message: "게시글이 삭제되었습니다." });
-    else res.status(500).json({ message: "게시글 삭제에 실패했습니다." });
+    if (result)
+      return res.status(200).json({ message: "게시글이 삭제되었습니다." });
+    else
+      return res.status(500).json({ message: "게시글 삭제에 실패했습니다." });
   } catch (err) {
     next(err);
   }
