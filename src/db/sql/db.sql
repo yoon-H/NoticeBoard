@@ -47,3 +47,19 @@ CREATE TABLE IF NOT EXISTS images
     FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY (post_id) REFERENCES posts(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS attachments
+(
+    id              INT AUTO_INCREMENT PRIMARY KEY,
+    user_id         INT,
+    post_id         INT DEFAULT NULL,
+    original_name   VARCHAR(255),
+    stored_name     VARCHAR(255),
+    url             VARCHAR(255),
+    create_dt       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_temp         BOOLEAN DEFAULT TRUE,
+    is_deleted      BOOLEAN DEFAULT FALSE,
+    delete_dt       TIMESTAMP DEFAULT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (post_id) REFERENCES posts(id) ON UPDATE CASCADE ON DELETE CASCADE
+);
