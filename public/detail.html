@@ -312,9 +312,6 @@
                     if (!data.files) return;
                     const files = data.files;
 
-
-                    console.log(files);
-
                     const fileRoot = document.getElementById("post-files");
 
                     for (const file of files) {
@@ -549,8 +546,6 @@
             // 수정 적용
             const newContent = rootComment.find('.edit-input').val();
 
-            console.log("newContent : ", newContent);
-
             $.ajax({
                 url: `./api/comments/${commentId}`,
                 method: 'put',
@@ -616,7 +611,6 @@
             const commentBtns = rootComment.find('.comment-btns');
             const contentBlock = rootComment.find('.comment-content');
             const originalText = contentBlock.data('original');
-            console.log(originalText);
 
             commentBtns.empty().append(`<button type="button" class="comment-edit-btn">수정</button>
                         <button type="button" class="comment-delete-btn">삭제</button>`);

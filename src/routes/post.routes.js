@@ -49,8 +49,6 @@ router.get("/posts", async (req, res, next) => {
   try {
     const posts = await getAllPosts();
 
-    console.log(posts);
-
     return res.status(200).json(posts);
   } catch (err) {
     next(err);
@@ -179,9 +177,6 @@ router.get("/posts/:postId", async (req, res, next) => {
 
     const files = await getAttachmentsByPost(postId);
 
-    console.log("라우터 내부 파일들");
-    console.log(files);
-
     return res.status(200).json({ post: post, files: files });
   } catch (err) {
     next(err);
@@ -237,7 +232,7 @@ router.get("/posts/:postId", async (req, res, next) => {
 router.put("/posts/:postId", authMiddleware, async (req, res, next) => {
   try {
     const postId = req.params.postId;
-    const { title, content } = req.body;
+    const { title, content, files } = req.body;
     const author = req.user.id;
 
     if (isNaN(postId))
@@ -266,7 +261,7 @@ router.put("/posts/:postId", authMiddleware, async (req, res, next) => {
       author,
     };
 
-    await editPost(obj);
+    await editPost(obj, files);
 
     return res.status(200).json({ message: "게시글이 수정되었습니다." });
   } catch (err) {

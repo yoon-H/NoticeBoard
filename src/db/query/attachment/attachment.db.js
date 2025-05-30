@@ -6,9 +6,6 @@ export const getAttachmentsByPost = async (postId) => {
     SQL_ATTACHMENT_QUERIES.GET_ATTACHMENTS_BY_POST, [postId]
   );
 
-  console.log("파일 출력");
-  console.log(rows);
-
   return rows;
 };
 

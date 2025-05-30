@@ -188,6 +188,8 @@
             const title = document.getElementById("title");
             const content = document.getElementById("content");
 
+            const fileHeader = document.getElementById("post-files");
+
             // 글 작성 에디터
             const quill = new Quill('#editor', {
                 theme: 'snow',
@@ -210,8 +212,31 @@
                     url: `./api/posts/${postId}`,
                     method: 'get',
                     success: function (data) {
-                        title.value = data.title;
-                        quill.root.innerHTML = data.content;
+                        if (!data) return;
+
+                        if (!data.post) return;
+
+                        const post = data.post;
+
+                        title.value = post.title;
+                        quill.root.innerHTML = post.content;
+
+                        if (!data.files) return;
+                        const files = data.files;
+
+                        for (const file of data.files) {
+                            fileHeader
+                                .insertAdjacentHTML("beforeend",
+                                    `<div data-file-id="${file.id}" class="file">
+                                    <a href="${file.url}" target="_blank" rel="noopener noreferrer" download>
+                                    ${file.originalName}
+                                    </a>
+                                    <button class="delete-btn"}>삭제</button>
+                                </div>`
+                                );
+                        }
+
+
                     },
                     error: function (req, status, err) {
                         const res = req.responseJSON;
@@ -305,7 +330,6 @@
             })
 
             $('#attachment-header').on('change', function (event) {
-                console.log("file");
                 const files = event.target.files;
                 const formData = new FormData();
 
@@ -320,13 +344,7 @@
                     processData: false,
                     contentType: false,
                     success: function (data) {
-
-                        const fileHeader = document.getElementById("post-files");
-
-                        console.log(fileHeader);
-
                         for (const file of data.files) {
-                            console.log(file);
                             fileHeader
                                 .insertAdjacentHTML("beforeend",
                                     `<div data-file-id="${file.id}" class="file">
