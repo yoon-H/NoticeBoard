@@ -5,7 +5,7 @@ import {
 } from "../middlewares/multer.middleware.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
 import { saveTempImage } from "../db/query/image/image.db.js";
-import { saveTempAttachment } from "../db/query/attachment/attachment.db.js";
+import { saveTempAttachment, softDeleteAttachment } from "../db/query/attachment/attachment.db.js";
 
 const router = Router();
 
@@ -69,16 +69,38 @@ router.post(
           url: attachmentUrl + file.filename,
         };
 
-        await saveTempAttachment(obj);
+        const result = await saveTempAttachment(obj);
 
-        savedFiles.push({
-          originalName: file.originalname,
-          storedName: file.filename,
-          url: attachmentUrl + file.filename,
-        });
+        if (result.insertId) {
+          savedFiles.push({
+            id: result.insertId,
+            originalName: file.originalname,
+            storedName: file.filename,
+            url: attachmentUrl + file.filename,
+          });
+        }
       }
 
       return res.status(200).json({ files: savedFiles });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+router.delete(
+  "/upload/attachment/:attachmentId",
+  authMiddleware,
+  async (req, res, next) => {
+    try {
+      const attachmentId = req.params.attachmentId;
+
+      if (isNaN(attachmentId))
+        return res.status(400).json({ message: "자료형을 확인해주세요." });
+
+      await softDeleteAttachment(attachmentId);
+
+      return res.status(200).json({ message: "파일이 삭제되었습니다." });
     } catch (err) {
       next(err);
     }
