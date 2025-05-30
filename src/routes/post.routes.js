@@ -8,6 +8,7 @@ import {
 } from "../db/query/post/post.db.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
 import { sanitizePost } from "../utils/sanitizeContent.js";
+import { getAttachmentsByPost } from "../db/query/attachment/attachment.db.js";
 
 const router = Router();
 
@@ -176,7 +177,12 @@ router.get("/posts/:postId", async (req, res, next) => {
         .status(404)
         .json({ deletedCode: "post", message: "삭제된 게시글입니다." });
 
-    return res.status(200).json(post);
+    const files = await getAttachmentsByPost(postId);
+
+    console.log("라우터 내부 파일들");
+    console.log(files);
+
+    return res.status(200).json({ post: post, files: files });
   } catch (err) {
     next(err);
   }

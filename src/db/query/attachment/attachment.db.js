@@ -1,6 +1,17 @@
 import SQL_ATTACHMENT_QUERIES from "./attachment.queries.js";
 import pool from "../../database.js";
 
+export const getAttachmentsByPost = async (postId) => {
+  const [rows] = await pool.query(
+    SQL_ATTACHMENT_QUERIES.GET_ATTACHMENTS_BY_POST, [postId]
+  );
+
+  console.log("파일 출력");
+  console.log(rows);
+
+  return rows;
+};
+
 export const saveTempAttachment = async ({
   userId,
   originalName,
