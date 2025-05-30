@@ -104,6 +104,17 @@
             background-color: white;
         }
 
+        #post-files {
+            padding-bottom: 5px;
+            border-bottom-color: rgb(255, 81, 81);
+            border-bottom-width: 2px;
+            border-bottom-style: solid;
+        }
+
+        .file {
+            display: flex;
+        }
+
         #post-content {
             border-bottom-color: rgb(255, 81, 81);
             border-bottom-width: 2px;
@@ -241,6 +252,21 @@
             return true;
         }
 
+        function formatDate(date) {
+            return new Date(date).toLocaleString("ko-KR", {
+                timeZone: "Asia/Seoul",
+            });
+        }
+
+        function getEffectiveDate(createDate, updateDate) {
+            const create = formatDate(createDate);
+            const update = formatDate(updateDate);
+
+            const isEdited = create < update;
+
+            return create < update ?
+                update + '(수정됨)' : create;
+        }
 
         $(document).ready(function () {
             // 토큰 가져오기
@@ -268,24 +294,55 @@
 
             // 글 조회
             $.ajax({
-                url: root + `/posts/${postId}`,
+                url: `./api/posts/${postId}`,
                 method: 'get',
                 success: function (data) {
                     if (!data) return;
 
-                    title.textContent = data.title;
-                    postTime.textContent = data.time;
-                    author.textContent = data.author;
-                    content.textContent = data.content;
+                    if (!data.post) return;
+                    const post = data.post;
 
-                    postAuthorId = data.userId;
+                    title.textContent = post.title;
+                    author.textContent = post.author;
+                    content.innerHTML = post.content;
+                    postTime.textContent = getEffectiveDate(post.createTime, post.updateTime);
+
+                    postAuthorId = post.userId;
+
+                    if (!data.files) return;
+                    const files = data.files;
+
+                    const fileRoot = document.getElementById("post-files");
+
+                    for (const file of files) {
+                        const html = `
+                            <div class="attachment" data-file-id="${file.id}">
+                                <a href="${file.url}" download="${file.originalName}">${file.originalName}</a>
+                            </div>
+                        `;
+
+                        fileRoot.insertAdjacentHTML("afterbegin", html);
+                    }
                 },
                 error: function (req, status, err) {
                     const res = req.responseJSON;
 
-                    if (res && res.message)
-                        alert(res.message);
+                    if (!res) return;
 
+                    if (res.message) {
+                        alert(res.message);
+                    }
+
+                    if (res.deletedCode) {
+                        switch (res.deletedCode) {
+                            case 'post':
+                                window.location.replace(`./index.html`);
+                                break;
+                            case 'comment':
+                                window.location.replace(`./detail.html?id=${postId}`);
+                                break;
+                        }
+                    }
                     return;
                 }
             });
@@ -296,7 +353,7 @@
             pages = document.getElementById("comment-pages");
 
             $.ajax({
-                url: root + `/posts/${postId}/comments`,
+                url: `./api/posts/${postId}/comments`,
                 method: 'get',
                 success: function (data) {
                     if (!data) return;
@@ -307,17 +364,18 @@
                         groups.push(data.slice(i, i + 10));
                     }
 
-                    console.log(groups);
-
                     if (groups.length <= 0) return;
 
                     for (const comment of groups[0]) {
+
+                        const commentTime = getEffectiveDate(comment.createTime, comment.updateTime);
+
                         commentContainer.insertAdjacentHTML("beforeend",
                             `<div class="comment" data-comment-id="${comment.id}" data-author-id="${comment.authorId}">
                                 <div class="comment-header">
                                     <div class="comment-info">
                                         <p class="author">${comment.author}</p>
-                                        <p class="time" class="comment-time">${comment.time}</p>
+                                        <p class="time" class="comment-time">${commentTime}</p>
                                     </div>
                                     <div class="comment-btns">
                                         <button type="button" class="comment-edit-btn">수정</button>
@@ -357,7 +415,7 @@
                 const commentContent = document.getElementById("content");
 
                 $.ajax({
-                    url: root + `/posts/${postId}/comments`,
+                    url: `./api/posts/${postId}/comments`,
                     method: 'post',
                     dataType: 'json',
                     data: {
@@ -372,8 +430,22 @@
                     error: function (req, status, err) {
                         const res = req.responseJSON;
 
-                        if (res && res.message)
+                        if (!res) return;
+
+                        if (res.message) {
                             alert(res.message);
+                        }
+
+                        if (res.deletedCode) {
+                            switch (res.deletedCode) {
+                                case 'post':
+                                    window.location.replace(`./index.html`);
+                                    break;
+                                case 'comment':
+                                    window.location.replace(`./detail.html?id=${postId}`);
+                                    break;
+                            }
+                        }
 
                         return;
                     }
@@ -396,7 +468,7 @@
                 return;
 
             $.ajax({
-                url: root + `/posts/${postId}`,
+                url: `./api/posts/${postId}`,
                 method: 'delete',
                 success: function (data) {
                     if (data && data.message)
@@ -407,8 +479,22 @@
                 error: function (req, status, err) {
                     const res = req.responseJSON;
 
-                    if (res && res.message)
+                    if (!res) return;
+
+                    if (res.message) {
                         alert(res.message);
+                    }
+
+                    if (res.deletedCode) {
+                        switch (res.deletedCode) {
+                            case 'post':
+                                window.location.replace(`./index.html`);
+                                break;
+                            case 'comment':
+                                window.location.replace(`./detail.html?id=${postId}`);
+                                break;
+                        }
+                    }
 
                     return;
                 }
@@ -460,10 +546,8 @@
             // 수정 적용
             const newContent = rootComment.find('.edit-input').val();
 
-            console.log("newContent : ", newContent);
-
             $.ajax({
-                url: root + `/comments/${commentId}`,
+                url: `./api/comments/${commentId}`,
                 method: 'put',
                 dataType: 'json',
                 data: {
@@ -476,7 +560,8 @@
                     const commentBtns = rootComment.find('.comment-btns');
                     const contentBlock = rootComment.find('.comment-content');
                     const authorBlock = rootComment.find('.time');
-                    authorBlock.text(data.time);
+
+                    authorBlock.text(formatDate(data.time) + '(수정됨)');
 
                     commentBtns.empty().append(`<button type="button" class="comment-edit-btn">수정</button>
                         <button type="button" class="comment-delete-btn">삭제</button>`)
@@ -485,8 +570,22 @@
                 error: function (req, status, err) {
                     const res = req.responseJSON;
 
-                    if (res && res.message)
+                    if (!res) return;
+
+                    if (res.message) {
                         alert(res.message);
+                    }
+
+                    if (res.deletedCode) {
+                        switch (res.deletedCode) {
+                            case 'post':
+                                window.location.replace(`./index.html`);
+                                break;
+                            case 'comment':
+                                window.location.replace(`./detail.html?id=${postId}`);
+                                break;
+                        }
+                    }
 
                     return;
                 }
@@ -512,7 +611,6 @@
             const commentBtns = rootComment.find('.comment-btns');
             const contentBlock = rootComment.find('.comment-content');
             const originalText = contentBlock.data('original');
-            console.log(originalText);
 
             commentBtns.empty().append(`<button type="button" class="comment-edit-btn">수정</button>
                         <button type="button" class="comment-delete-btn">삭제</button>`);
@@ -536,7 +634,7 @@
                 return;
 
             $.ajax({
-                url: root + `/comments/${commentId}`,
+                url: `./api/comments/${commentId}`,
                 method: 'delete',
                 success: function (data) {
                     if (data && data.message)
@@ -547,8 +645,22 @@
                 error: function (req, status, err) {
                     const res = req.responseJSON;
 
-                    if (res && res.message)
+                    if (!res) return;
+
+                    if (res.message) {
                         alert(res.message);
+                    }
+
+                    if (res.deletedCode) {
+                        switch (res.deletedCode) {
+                            case 'post':
+                                window.location.replace(`./index.html`);
+                                break;
+                            case 'comment':
+                                window.location.replace(`./detail.html?id=${postId}`);
+                                break;
+                        }
+                    }
 
                     return;
                 }
@@ -608,6 +720,8 @@
                 <button type="button" id="edit-btn">수정</button>
                 <button type="button" id="delete-btn">삭제</button>
             </div>
+        </div>
+        <div id="post-files">
         </div>
         <div id="post-content">
             <p>

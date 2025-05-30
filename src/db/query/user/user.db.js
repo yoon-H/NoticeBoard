@@ -1,7 +1,7 @@
 import pool from "../../database.js";
 import SQL_USER_QUERIES from "./user.queries.js";
 
-export const createUser = async (name, id, password) => {
+export const createUser = async ({name, id, password}) => {
   await pool.query(SQL_USER_QUERIES.CREATE_USER, [name, id, password]);
 };
 

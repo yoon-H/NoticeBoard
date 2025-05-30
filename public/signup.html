@@ -141,7 +141,7 @@
                     return alert("비밀번호와 일치하지 않습니다.");
 
                 $.ajax({
-                    url: root + '/auth/signup',
+                    url: './api/auth/signup',
                     method: 'post',
                     dataType: 'json',
                     data: {
