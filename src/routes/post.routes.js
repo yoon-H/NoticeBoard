@@ -1,6 +1,6 @@
 import { Router } from "express";
 import {
-  createPostWithImages,
+  createPost,
   deletePost,
   editPost,
   getAllPosts,
@@ -8,6 +8,7 @@ import {
 } from "../db/query/post/post.db.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
 import { sanitizePost } from "../utils/sanitizeContent.js";
+import { getAttachmentsByPost } from "../db/query/attachment/attachment.db.js";
 
 const router = Router();
 
@@ -47,8 +48,6 @@ const router = Router();
 router.get("/posts", async (req, res, next) => {
   try {
     const posts = await getAllPosts();
-
-    console.log(posts);
 
     return res.status(200).json(posts);
   } catch (err) {
@@ -97,7 +96,7 @@ router.get("/posts", async (req, res, next) => {
  */
 router.post("/posts", authMiddleware, async (req, res, next) => {
   try {
-    const { title, content } = req.body;
+    const { title, content, files } = req.body;
     const author = req.user.id;
 
     if (!title || !author || !content)
@@ -106,7 +105,7 @@ router.post("/posts", authMiddleware, async (req, res, next) => {
     const obj = { title, author, content: sanitizePost(content) };
 
     // 트랜잭션
-    const result = await createPostWithImages(obj);
+    const result = await createPost(obj, files);
 
     if (result.insertId)
       return res
@@ -176,7 +175,9 @@ router.get("/posts/:postId", async (req, res, next) => {
         .status(404)
         .json({ deletedCode: "post", message: "삭제된 게시글입니다." });
 
-    return res.status(200).json(post);
+    const files = await getAttachmentsByPost(postId);
+
+    return res.status(200).json({ post: post, files: files });
   } catch (err) {
     next(err);
   }
@@ -231,7 +232,7 @@ router.get("/posts/:postId", async (req, res, next) => {
 router.put("/posts/:postId", authMiddleware, async (req, res, next) => {
   try {
     const postId = req.params.postId;
-    const { title, content } = req.body;
+    const { title, content, files } = req.body;
     const author = req.user.id;
 
     if (isNaN(postId))
@@ -260,7 +261,7 @@ router.put("/posts/:postId", authMiddleware, async (req, res, next) => {
       author,
     };
 
-    await editPost(obj);
+    await editPost(obj, files);
 
     return res.status(200).json({ message: "게시글이 수정되었습니다." });
   } catch (err) {
