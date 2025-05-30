@@ -48,7 +48,7 @@ router.post(
   multerAttachment,
   async (req, res, next) => {
     try {
-      if (!req.file) {
+      if (!req.files || req.files.length === 0) {
         return res.status(400).json({ error: "파일이 업로드되지 않았습니다." });
       }
 
@@ -58,18 +58,27 @@ router.post(
       const day = String(date.getDate()).padStart(2, "0");
 
       const attachmentUrl = `/uploads/attachments/${req.user.id}/${year}/${month}/${day}/`;
-      const url = attachmentUrl + req.file.filename;
 
-      const obj = {
-        userId: req.user.id,
-        originalName: req.file.originalname,
-        storedName: req.file.filename,
-        url: url,
-      };
+      const savedFiles = [];
 
-      await saveTempAttachment(obj);
+      for (const file of req.files) {
+        const obj = {
+          userId: req.user.id,
+          originalName: file.originalname,
+          storedName: file.filename,
+          url: attachmentUrl + file.filename,
+        };
 
-      return res.status(200).json({ attachmentUrl: url });
+        await saveTempAttachment(obj);
+
+        savedFiles.push({
+          originalName: file.originalname,
+          storedName: file.filename,
+          url: attachmentUrl + file.filename,
+        });
+      }
+
+      return res.status(200).json({ files: savedFiles });
     } catch (err) {
       next(err);
     }

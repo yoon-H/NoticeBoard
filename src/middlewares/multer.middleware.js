@@ -59,6 +59,7 @@ const attachmentStorage = multer.diskStorage({
   },
 });
 
-export const multerAttachment = multer({ storage: attachmentStorage }).single(
-  "attachment"
+export const multerAttachment = multer({ storage: attachmentStorage }).array(
+  "attachment",
+  10
 );
