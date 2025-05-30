@@ -8,6 +8,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import { getImageList } from "../../../utils/getImageList.js";
+import SQL_ATTACHMENT_QUERIES from "../attachment/attachment.queries.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -18,7 +19,7 @@ export const getAllPosts = async () => {
   return rows;
 };
 
-export const createPostWithImages = async ({ title, author, content }) => {
+export const createPost = async ({ title, author, content }, files) => {
   const tran = await pool.getConnection();
   await tran.beginTransaction();
 
@@ -58,6 +59,35 @@ export const createPostWithImages = async ({ title, author, content }) => {
           await tran.query(SQL_IMAGE_QUERIES.SAVE_IMAGE, [postId, img.id]);
         }
       }
+
+      // 첨부파일 처리
+      const [tempFiles] = await tran.query(
+        SQL_ATTACHMENT_QUERIES.GET_TEMP_ATTACHMENTS,
+        [author]
+      );
+
+      for (const file of tempFiles) {
+        if (!files.includes(String(file.id))) {
+          // 안 쓰이면
+          // 로컬 파일 삭제
+          const filePath = path.join(__dirname, "../../../../public", file.url);
+          fs.unlink(filePath, (err) => {
+            if (err) console.error(`${filePath} 삭제 실패했습니다. :`, err);
+          });
+
+          // DB 삭제
+          await tran.query(SQL_ATTACHMENT_QUERIES.DELETE_TEMP_ATTACHMENT, [
+            file.id,
+          ]);
+        } else {
+          // 쓰이면
+          await tran.query(SQL_ATTACHMENT_QUERIES.SAVE_ATTACHMENT, [
+            postId,
+            file.id,
+          ]);
+        }
+      }
+
       await tran.commit();
 
       result.insertId = postId;

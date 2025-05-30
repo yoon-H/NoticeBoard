@@ -100,7 +100,7 @@
         }
 
         .file {
-            display : flex;
+            display: flex;
         }
 
         #post-content {
@@ -174,7 +174,7 @@
             };
         }
 
-       
+
 
 
         $(document).ready(function () {
@@ -234,6 +234,16 @@
                     return;
                 }
 
+                // 첨부파일
+                const fileIds = [];
+
+                $('#post-files .file').each(function () {
+                    const fileId = $(this).data('file-id');  // data-file-id 값 가져오기
+                    if (fileId) {
+                        fileIds.push(fileId);
+                    }
+                });
+
                 if (isEditing) {
                     $.ajax({
                         url: `./api/posts/${postId}`,
@@ -242,6 +252,7 @@
                         data: {
                             title: titleValue,
                             content: contentValue,
+                            files: fileIds
                         },
                         success: function (data) {
                             alert("글이 수정되었습니다.");
@@ -276,6 +287,7 @@
                         data: {
                             title: titleValue,
                             content: contentValue,
+                            files: fileIds
                         },
                         success: function (data) {
                             alert("글이 작성되었습니다.");
@@ -294,43 +306,43 @@
 
             $('#attachment-header').on('change', function (event) {
                 console.log("file");
-            const files = event.target.files;
-            const formData = new FormData();
+                const files = event.target.files;
+                const formData = new FormData();
 
-            for (let i = 0; i < files.length; i++) {
-                formData.append("attachment", files[i]);
-            }
+                for (let i = 0; i < files.length; i++) {
+                    formData.append("attachment", files[i]);
+                }
 
-            $.ajax({
-                url: '/api/upload/attachment',
-                type: 'post',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function (data) {
+                $.ajax({
+                    url: '/api/upload/attachment',
+                    type: 'post',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (data) {
 
-                    const fileHeader = document.getElementById("post-files");
+                        const fileHeader = document.getElementById("post-files");
 
-                    console.log(fileHeader);
+                        console.log(fileHeader);
 
-                    for (const file of data.files) {
-                        console.log(file);
-                        fileHeader
-                            .insertAdjacentHTML("beforeend",
-                                `<div data-file-id="${file.id}" class="file">
+                        for (const file of data.files) {
+                            console.log(file);
+                            fileHeader
+                                .insertAdjacentHTML("beforeend",
+                                    `<div data-file-id="${file.id}" class="file">
                                     <a href="${file.url}" target="_blank" rel="noopener noreferrer" download>
                                     ${file.originalName}
                                     </a>
                                     <button class="delete-btn"}>삭제</button>
                                 </div>`
-                            );
+                                );
+                        }
+                    },
+                    error: function (req, status, error) {
+                        console.error('파일 업로드 실패:', error);
+                        alert('파일 업로드에 실패했습니다.');
                     }
-                },
-                error: function (req, status, error) {
-                    console.error('파일 업로드 실패:', error);
-                    alert('파일 업로드에 실패했습니다.');
-                }
-            });
+                });
             });
         })
 

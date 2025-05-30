@@ -1,6 +1,6 @@
 import { Router } from "express";
 import {
-  createPostWithImages,
+  createPost,
   deletePost,
   editPost,
   getAllPosts,
@@ -97,7 +97,7 @@ router.get("/posts", async (req, res, next) => {
  */
 router.post("/posts", authMiddleware, async (req, res, next) => {
   try {
-    const { title, content } = req.body;
+    const { title, content, files } = req.body;
     const author = req.user.id;
 
     if (!title || !author || !content)
@@ -106,7 +106,7 @@ router.post("/posts", authMiddleware, async (req, res, next) => {
     const obj = { title, author, content: sanitizePost(content) };
 
     // 트랜잭션
-    const result = await createPostWithImages(obj);
+    const result = await createPost(obj, files);
 
     if (result.insertId)
       return res
