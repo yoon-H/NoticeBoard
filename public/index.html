@@ -201,6 +201,31 @@
                     error: function (req, status, err) {
                         const res = req.responseJSON;
 
+                        if (
+                            req.status === 401 &&
+                            res.message === "토큰이 만료되었습니다."
+                        ) {
+                            $.ajax({
+                                url: `./api/auth/refresh`,
+                                method: 'post',
+                                success: function (data) {
+                                    if (!data) return;
+
+                                    alert(data.message);
+
+                                },
+                                error: function (req, status, err) {
+                                    const res = req.responseJSON;
+
+                                    if (res && res.message)
+                                        alert(res.message);
+
+                                    return;
+                                }
+                            });
+                        }
+
+
                         if (res && res.message)
                             alert(res.message);
 

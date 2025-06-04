@@ -240,22 +240,22 @@
         }
 
         $(document).ready(function () {
-            // 토큰 가져오기
-            const cookies = document.cookie.split(';');
-            const name = "authorization";
+            // // 토큰 가져오기
+            // const cookies = document.cookie.split(';');
+            // const name = "authorization";
 
-            if (cookies) {
-                for (let cookie of cookies) {
-                    const [key, value] = cookie.trim().split('=');
-                    if (key === name) {
-                        token = value;
-                        break;
-                    };
-                }
+            // if (cookies) {
+            //     for (let cookie of cookies) {
+            //         const [key, value] = cookie.trim().split('=');
+            //         if (key === name) {
+            //             token = value;
+            //             break;
+            //         };
+            //     }
 
-                if (token)
-                    decodedToken = jwt_decode(token);
-            }
+            //     if (token)
+            //         decodedToken = jwt_decode(token);
+            // }
 
             // 글 element
             const title = document.getElementById("title");
@@ -401,9 +401,35 @@
 
                         if (!res) return;
 
-                        if (res.message) {
-                            alert(res.message);
+                        if (
+                            req.status === 401 &&
+                            res.message === "토큰이 만료되었습니다."
+                        ) {
+                            $.ajax({
+                                url: `./api/auth/refresh`,
+                                method: 'post',
+                                success: function (data) {
+                                    if (!data) return;
+
+                                    alert(data.message);
+
+                                },
+                                error: function (req, status, err) {
+                                    const res = req.responseJSON;
+
+                                    if (res && res.message)
+                                        alert(res.message);
+
+                                    return;
+                                }
+                            });
+                        } else {
+                            if (res.message) {
+                                alert(res.message);
+                            }
                         }
+
+
 
                         if (res.deletedCode) {
                             switch (res.deletedCode) {
@@ -448,8 +474,35 @@
                 error: function (req, status, err) {
                     const res = req.responseJSON;
 
-                    if (res && res.message)
-                        alert(res.message);
+                    if (
+                        req.status === 401 &&
+                        res.message === "토큰이 만료되었습니다."
+                    ) {
+                        console.log("토큰 만료")
+                        $.ajax({
+                            url: `./api/auth/refresh`,
+                            method: 'post',
+                            success: function (data) {
+                                if (!data) return;
+
+                                alert(data.message);
+
+                            },
+                            error: function (req, status, err) {
+                                const res = req.responseJSON;
+
+                                if (res && res.message)
+                                    alert(res.message);
+
+                                return;
+                            }
+                        });
+                    } else {
+                        if (res && res.message)
+                            alert(res.message);
+
+                    }
+
 
                     return;
                 }
@@ -491,9 +544,35 @@
 
                             if (!res) return;
 
-                            if (res.message) {
-                                alert(res.message);
+                            if (
+                                req.status === 401 &&
+                                res.message === "토큰이 만료되었습니다."
+                            ) {
+                                $.ajax({
+                                    url: `./api/auth/refresh`,
+                                    method: 'post',
+                                    success: function (data) {
+                                        if (!data) return;
+
+                                        alert(data.message);
+
+                                    },
+                                    error: function (req, status, err) {
+                                        const res = req.responseJSON;
+
+                                        if (res && res.message)
+                                            alert(res.message);
+
+                                        return;
+                                    }
+                                });
+                            } else {
+                                if (res.message) {
+                                    alert(res.message);
+                                }
                             }
+
+
 
                             if (res.deletedCode) {
                                 switch (res.deletedCode) {
@@ -514,8 +593,34 @@
                 error: function (req, status, err) {
                     const res = req.responseJSON;
 
-                    if (res && res.message)
-                        alert(res.message);
+                    if (
+                        req.status === 401 &&
+                        res.message === "토큰이 만료되었습니다."
+                    ) {
+                        $.ajax({
+                            url: `./api/auth/refresh`,
+                            method: 'post',
+                            success: function (data) {
+                                if (!data) return;
+
+                                alert(data.message);
+
+                            },
+                            error: function (req, status, err) {
+                                const res = req.responseJSON;
+
+                                if (res && res.message)
+                                    alert(res.message);
+
+                                return;
+                            }
+                        });
+                    } else {
+
+                        if (res && res.message)
+                            alert(res.message);
+                    }
+
 
                     return;
                 }
@@ -567,8 +672,34 @@
                 error: function (req, status, err) {
                     const res = req.responseJSON;
 
-                    if (res && res.message)
-                        alert(res.message);
+                    if (
+                        req.status === 401 &&
+                        res.message === "토큰이 만료되었습니다."
+                    ) {
+                        $.ajax({
+                            url: `./api/auth/refresh`,
+                            method: 'post',
+                            success: function (data) {
+                                if (!data) return;
+
+                                alert(data.message);
+
+                            },
+                            error: function (req, status, err) {
+                                const res = req.responseJSON;
+
+                                if (res && res.message)
+                                    alert(res.message);
+
+                                return;
+                            }
+                        });
+                    } else {
+
+                        if (res && res.message)
+                            alert(res.message);
+                    }
+
 
                     return;
                 }
@@ -634,9 +765,35 @@
 
                             if (!res) return;
 
-                            if (res.message) {
-                                alert(res.message);
+                            if (
+                                req.status === 401 &&
+                                res.message === "토큰이 만료되었습니다."
+                            ) {
+                                $.ajax({
+                                    url: `./api/auth/refresh`,
+                                    method: 'post',
+                                    success: function (data) {
+                                        if (!data) return;
+
+                                        alert(data.message);
+
+                                    },
+                                    error: function (req, status, err) {
+                                        const res = req.responseJSON;
+
+                                        if (res && res.message)
+                                            alert(res.message);
+
+                                        return;
+                                    }
+                                });
+                            } else {
+                                if (res.message) {
+                                    alert(res.message);
+                                }
                             }
+
+
 
                             if (res.deletedCode) {
                                 switch (res.deletedCode) {
@@ -657,8 +814,34 @@
                 error: function (req, status, err) {
                     const res = req.responseJSON;
 
-                    if (res && res.message)
-                        alert(res.message);
+                    if (
+                        req.status === 401 &&
+                        res.message === "토큰이 만료되었습니다."
+                    ) {
+                        $.ajax({
+                            url: `./api/auth/refresh`,
+                            method: 'post',
+                            success: function (data) {
+                                if (!data) return;
+
+                                alert(data.message);
+
+                            },
+                            error: function (req, status, err) {
+                                const res = req.responseJSON;
+
+                                if (res && res.message)
+                                    alert(res.message);
+
+                                return;
+                            }
+                        });
+                    } else {
+
+                        if (res && res.message)
+                            alert(res.message);
+                    }
+
 
                     return;
                 }
@@ -730,9 +913,35 @@
 
                             if (!res) return;
 
-                            if (res.message) {
-                                alert(res.message);
+                            if (
+                                req.status === 401 &&
+                                res.message === "토큰이 만료되었습니다."
+                            ) {
+                                $.ajax({
+                                    url: `./api/auth/refresh`,
+                                    method: 'post',
+                                    success: function (data) {
+                                        if (!data) return;
+
+                                        alert(data.message);
+
+                                    },
+                                    error: function (req, status, err) {
+                                        const res = req.responseJSON;
+
+                                        if (res && res.message)
+                                            alert(res.message);
+
+                                        return;
+                                    }
+                                });
+                            } else {
+                                if (res.message) {
+                                    alert(res.message);
+                                }
                             }
+
+
 
                             if (res.deletedCode) {
                                 switch (res.deletedCode) {
@@ -753,8 +962,34 @@
                 error: function (req, status, err) {
                     const res = req.responseJSON;
 
-                    if (res && res.message)
-                        alert(res.message);
+                    if (
+                        req.status === 401 &&
+                        res.message === "토큰이 만료되었습니다."
+                    ) {
+                        $.ajax({
+                            url: `./api/auth/refresh`,
+                            method: 'post',
+                            success: function (data) {
+                                if (!data) return;
+
+                                alert(data.message);
+
+                            },
+                            error: function (req, status, err) {
+                                const res = req.responseJSON;
+
+                                if (res && res.message)
+                                    alert(res.message);
+
+                                return;
+                            }
+                        });
+                    } else {
+
+                        if (res && res.message)
+                            alert(res.message);
+                    }
+
 
                     return;
                 }
