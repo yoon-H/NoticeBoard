@@ -187,6 +187,29 @@
                     return;
                 }
             });
+
+            $("#write-btn").on("click", function () {
+                $.ajax({
+                    url: `./api/auth/profile`,
+                    method: 'get',
+                    success: function (data) {
+                        if (!data || !data.user || !data.user.id) return;
+
+                        window.location.href = "./post.html";
+
+                    },
+                    error: function (req, status, err) {
+                        const res = req.responseJSON;
+
+                        if (res && res.message)
+                            alert(res.message);
+
+                        return;
+                    }
+                });
+            })
+
+
         })
 
         // 페이지 클릭 이벤트
@@ -224,7 +247,7 @@
     </header>
     <div id="board-container">
         <div id="board-header">
-            <a id="write-btn" href="./post.html">글쓰기</a>
+            <a id="write-btn">글쓰기</a>
         </div>
         <div id="post-list">
             <div class="post" id="info">
