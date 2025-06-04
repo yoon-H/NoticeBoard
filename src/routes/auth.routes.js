@@ -148,7 +148,12 @@ router.post("/auth/login", async (req, res, next) => {
       return res.status(400).json({ message: "비밀번호가 일치하지 않습니다." });
 
     const token = generateToken(user.id);
-    res.cookie("authorization", `Bearer ${token}`);
+    res.cookie("authorization", `Bearer ${token}`, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "Strict",
+      maxAge: 1000 * 60 * 30,
+    });
 
     return res.status(200).json({ message: "로그인이 완료되었습니다." });
   } catch (err) {
