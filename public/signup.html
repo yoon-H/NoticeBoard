@@ -66,9 +66,6 @@
             box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
         }
 
-
-        #signup-header {}
-
         #signup-header .input-text {
             margin: 20px 30px;
             display: flex;
@@ -105,13 +102,57 @@
         #submit-btn:hover {
             background-color: crimson;
         }
+
+        .dialog {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dialog.hidden {
+            display: none;
+        }
+
+        .dialog-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
     </style>
     <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
     <script>
-        $(document).ready(function () {
-            const root = 'http://localhost:3000/api';
+        function showDialog(message, callback) {
+            const dialog = document.getElementById('customDialog');
+            const dialogMessage = document.getElementById('dialogMessage');
+            const dialogOk = document.getElementById('dialogOk');
 
-            $("#submit-btn").on("click", function () {
+            dialogMessage.textContent = message;
+            dialog.classList.remove('hidden');
+
+            function onOk() {
+                dialog.classList.add('hidden');
+                dialogOk.removeEventListener('click', onOk);
+                if (callback) callback();
+            }
+
+            dialogOk.addEventListener('click', onOk);
+        }
+
+        function showDialogAsync(message) {
+            return new Promise((resolve) => {
+                showDialog(message, resolve);
+            });
+        }
+
+        $(document).ready(function () {
+            $("#submit-btn").on("click", async function () {
 
                 // 데이터
                 const id = document.getElementById("login-id").value;
@@ -127,18 +168,18 @@
 
                 // 이메일 검사
                 if (!ID_REG.test(id))
-                    return alert("아이디를 다시 입력해주세요.");
+                    return await showDialogAsync("아이디를 다시 입력해주세요.");
 
                 // 닉네임 검사
                 if (!NAME_REG.test(name))
-                    return alert("닉네임을 다시 입력해주세요.");
+                    return await showDialogAsync("닉네임을 다시 입력해주세요.");
 
                 // 비밀번호 검사
                 if (!PW_REG.test(password))
-                    return alert("비밀번호를 다시 입력해주세요.");
+                    return await showDialogAsync("비밀번호를 다시 입력해주세요.");
 
                 if (password !== confirmPassword)
-                    return alert("비밀번호와 일치하지 않습니다.");
+                    return await showDialogAsync("비밀번호와 일치하지 않습니다.");
 
                 $.ajax({
                     url: './api/auth/signup',
@@ -150,15 +191,15 @@
                         password: password,
                         confirmPassword: confirmPassword
                     },
-                    success: function (data) {
-                        alert("회원가입이 완료되었습니다.");
+                    success: async function (data) {
+                        await showDialogAsync("회원가입이 완료되었습니다.");
                         window.location.replace("./index.html");
                     },
-                    error: function (req, status, err) {
+                    error: async function (req, status, err) {
                         const res = req.responseJSON;
 
                         if (res && res.message)
-                            alert(res.message);
+                            await showDialogAsync(res.message);
                     }
                 });
             })
@@ -197,6 +238,12 @@
         </div>
         <div id="submit">
             <button type="submit" id="submit-btn">제출</button>
+        </div>
+    </div>
+    <div id="customDialog" class="dialog hidden">
+        <div class="dialog-content">
+            <p id="dialogMessage">메시지 내용</p>
+            <button id="dialogOk">확인</button>
         </div>
     </div>
 </body>

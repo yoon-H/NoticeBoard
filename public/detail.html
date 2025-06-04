@@ -205,13 +205,81 @@
         #submit-btn:hover {
             background-color: crimson;
         }
+
+        .dialog {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dialog.hidden {
+            display: none;
+        }
+
+        .dialog-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .dialog {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dialog.hidden {
+            display: none;
+        }
+
+        .dialog-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
     </style>
     <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
     <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
     <script>
+        function showDialog(message, callback) {
+            const dialog = document.getElementById('customDialog');
+            const dialogMessage = document.getElementById('dialogMessage');
+            const dialogOk = document.getElementById('dialogOk');
+
+            dialogMessage.textContent = message;
+            dialog.classList.remove('hidden');
+
+            function onOk() {
+                dialog.classList.add('hidden');
+                dialogOk.removeEventListener('click', onOk);
+                if (callback) callback();
+            }
+
+            dialogOk.addEventListener('click', onOk);
+        }
+
+        function showDialogAsync(message) {
+            return new Promise((resolve) => {
+                showDialog(message, resolve);
+            });
+        }
+
         let token;
         let decodedToken;
-        const root = 'http://localhost:3000/api';
 
         // 글 아이디 추출
         const params = new URLSearchParams(window.location.search);
@@ -240,23 +308,6 @@
         }
 
         $(document).ready(function () {
-            // // 토큰 가져오기
-            // const cookies = document.cookie.split(';');
-            // const name = "authorization";
-
-            // if (cookies) {
-            //     for (let cookie of cookies) {
-            //         const [key, value] = cookie.trim().split('=');
-            //         if (key === name) {
-            //             token = value;
-            //             break;
-            //         };
-            //     }
-
-            //     if (token)
-            //         decodedToken = jwt_decode(token);
-            // }
-
             // 글 element
             const title = document.getElementById("title");
             const postTime = document.getElementById("post-time");
@@ -295,13 +346,13 @@
                         fileRoot.insertAdjacentHTML("afterbegin", html);
                     }
                 },
-                error: function (req, status, err) {
+                error: async function (req, status, err) {
                     const res = req.responseJSON;
 
                     if (!res) return;
 
                     if (res.message) {
-                        alert(res.message);
+                        await showDialogAsync(res.message);
                     }
 
                     if (res.deletedCode) {
@@ -368,11 +419,11 @@
                         );
                     }
                 },
-                error: function (req, status, err) {
+                error: async function (req, status, err) {
                     const res = req.responseJSON;
 
                     if (res && res.message)
-                        alert(res.message);
+                        await showDialogAsync(res.message);
 
                     return;
                 }
@@ -390,13 +441,13 @@
                     data: {
                         content: commentContent.value,
                     },
-                    success: function (data) {
+                    success: async function (data) {
                         if (data && data.message)
-                            alert(data.message);
+                            await showDialogAsync(data.message);
 
                         window.location.replace(`./detail.html?id=${postId}`);
                     },
-                    error: function (req, status, err) {
+                    error: async function (req, status, err) {
                         const res = req.responseJSON;
 
                         if (!res) return;
@@ -408,24 +459,24 @@
                             $.ajax({
                                 url: `./api/auth/refresh`,
                                 method: 'post',
-                                success: function (data) {
+                                success: async function (data) {
                                     if (!data) return;
 
-                                    alert(data.message);
+                                    await showDialogAsync(data.message);
 
                                 },
-                                error: function (req, status, err) {
+                                error: async function (req, status, err) {
                                     const res = req.responseJSON;
 
                                     if (res && res.message)
-                                        alert(res.message);
+                                        await showDialogAsync(res.message);
 
                                     return;
                                 }
                             });
                         } else {
                             if (res.message) {
-                                alert(res.message);
+                                await showDialogAsync(res.message);
                             }
                         }
 
@@ -456,7 +507,7 @@
             $.ajax({
                 url: `./api/auth/profile`,
                 method: 'get',
-                success: function (data) {
+                success: async function (data) {
                     if (!data || !data.user) return;
 
                     user = data.user;
@@ -464,14 +515,14 @@
                     if (!user) return;
 
                     if (user.id !== postAuthorId) {
-                        alert("작성자가 아닙니다.");
+                        await showDialogAsync("작성자가 아닙니다.");
                         return;
                     }
 
                     window.location.replace(`./post.html?id=${postId}`);
 
                 },
-                error: function (req, status, err) {
+                error: async function (req, status, err) {
                     const res = req.responseJSON;
 
                     if (
@@ -482,24 +533,24 @@
                         $.ajax({
                             url: `./api/auth/refresh`,
                             method: 'post',
-                            success: function (data) {
+                            success: async function (data) {
                                 if (!data) return;
 
-                                alert(data.message);
+                                await showDialogAsync(data.message);
 
                             },
-                            error: function (req, status, err) {
+                            error: async function (req, status, err) {
                                 const res = req.responseJSON;
 
                                 if (res && res.message)
-                                    alert(res.message);
+                                    await showDialogAsync(res.message);
 
                                 return;
                             }
                         });
                     } else {
                         if (res && res.message)
-                            alert(res.message);
+                            await showDialogAsync(res.message);
 
                     }
 
@@ -517,7 +568,7 @@
             $.ajax({
                 url: `./api/auth/profile`,
                 method: 'get',
-                success: function (data) {
+                success: async function (data) {
                     if (!data || !data.user) return;
 
                     user = data.user;
@@ -526,20 +577,20 @@
                     if (!user) return;
 
                     if (user.id !== postAuthorId) {
-                        alert("작성자가 아닙니다.");
+                        await showDialogAsync("작성자가 아닙니다.");
                         return;
                     }
 
                     $.ajax({
                         url: `./api/posts/${postId}`,
                         method: 'delete',
-                        success: function (data) {
+                        success: async function (data) {
                             if (data && data.message)
-                                alert(data.message);
+                                await showDialogAsync(data.message);
 
                             window.location.replace('./index.html');
                         },
-                        error: function (req, status, err) {
+                        error: async function (req, status, err) {
                             const res = req.responseJSON;
 
                             if (!res) return;
@@ -551,24 +602,24 @@
                                 $.ajax({
                                     url: `./api/auth/refresh`,
                                     method: 'post',
-                                    success: function (data) {
+                                    success: async function (data) {
                                         if (!data) return;
 
-                                        alert(data.message);
+                                        await showDialogAsync(data.message);
 
                                     },
-                                    error: function (req, status, err) {
+                                    error: async function (req, status, err) {
                                         const res = req.responseJSON;
 
                                         if (res && res.message)
-                                            alert(res.message);
+                                            await showDialogAsync(res.message);
 
                                         return;
                                     }
                                 });
                             } else {
                                 if (res.message) {
-                                    alert(res.message);
+                                    await showDialogAsync(res.message);
                                 }
                             }
 
@@ -590,7 +641,7 @@
                     });
 
                 },
-                error: function (req, status, err) {
+                error: async function (req, status, err) {
                     const res = req.responseJSON;
 
                     if (
@@ -600,17 +651,17 @@
                         $.ajax({
                             url: `./api/auth/refresh`,
                             method: 'post',
-                            success: function (data) {
+                            success: async function (data) {
                                 if (!data) return;
 
-                                alert(data.message);
+                                await showDialogAsync(data.message);
 
                             },
-                            error: function (req, status, err) {
+                            error: async function (req, status, err) {
                                 const res = req.responseJSON;
 
                                 if (res && res.message)
-                                    alert(res.message);
+                                    await showDialogAsync(res.message);
 
                                 return;
                             }
@@ -618,7 +669,7 @@
                     } else {
 
                         if (res && res.message)
-                            alert(res.message);
+                            await showDialogAsync(res.message);
                     }
 
 
@@ -629,11 +680,11 @@
         })
 
         // 댓글 수정 버튼
-        $(document).on("click", ".comment-edit-btn", function () {
+        $(document).on("click", ".comment-edit-btn", async function () {
             const rootComment = $(this).closest('.comment');
 
             if (!rootComment) {
-                alert("해당 댓글을 찾을 수 없습니다.");
+                await showDialogAsync("해당 댓글을 찾을 수 없습니다.");
                 return;
             }
 
@@ -645,7 +696,7 @@
             $.ajax({
                 url: `./api/auth/profile`,
                 method: 'get',
-                success: function (data) {
+                success: async function (data) {
                     if (!data || !data.user) return;
 
                     user = data.user;
@@ -653,7 +704,7 @@
                     if (!user) return;
 
                     if (user.id !== writerId) {
-                        alert("작성자가 아닙니다.");
+                        await showDialogAsync("작성자가 아닙니다.");
                         return;
                     }
 
@@ -669,7 +720,7 @@
                     contentBlock.empty().append(`<textarea class="edit-input">${commentContent}</textarea>`);
 
                 },
-                error: function (req, status, err) {
+                error: async function (req, status, err) {
                     const res = req.responseJSON;
 
                     if (
@@ -679,17 +730,17 @@
                         $.ajax({
                             url: `./api/auth/refresh`,
                             method: 'post',
-                            success: function (data) {
+                            success: async function (data) {
                                 if (!data) return;
 
-                                alert(data.message);
+                                await showDialogAsync(data.message);
 
                             },
-                            error: function (req, status, err) {
+                            error: async function (req, status, err) {
                                 const res = req.responseJSON;
 
                                 if (res && res.message)
-                                    alert(res.message);
+                                    await showDialogAsync(res.message);
 
                                 return;
                             }
@@ -697,7 +748,7 @@
                     } else {
 
                         if (res && res.message)
-                            alert(res.message);
+                            await showDialogAsync(res.message);
                     }
 
 
@@ -708,11 +759,11 @@
         })
 
         // 댓글 수정 완료 버튼
-        $(document).on("click", ".comment-complete-edit", function () {
+        $(document).on("click", ".comment-complete-edit", async function () {
             const rootComment = $(this).closest('.comment');
 
             if (!rootComment) {
-                alert("해당 댓글을 찾을 수 없습니다.");
+                await showDialogAsync("해당 댓글을 찾을 수 없습니다.");
                 return;
             }
 
@@ -724,7 +775,7 @@
             $.ajax({
                 url: `./api/auth/profile`,
                 method: 'get',
-                success: function (data) {
+                success: async function (data) {
                     if (!data || !data.user) return;
 
                     user = data.user;
@@ -732,7 +783,7 @@
                     if (!user) return;
 
                     if (user.id !== writerId) {
-                        alert("작성자가 아닙니다.");
+                        await showDialogAsync("작성자가 아닙니다.");
                         return;
                     }
 
@@ -746,9 +797,9 @@
                         data: {
                             content: newContent,
                         },
-                        success: function (data) {
+                        success: async function (data) {
                             if (data && data.message)
-                                alert(data.message);
+                                await showDialogAsync(data.message);
 
                             const commentBtns = rootComment.find('.comment-btns');
                             const contentBlock = rootComment.find('.comment-content');
@@ -760,7 +811,7 @@
                         <button type="button" class="comment-delete-btn">삭제</button>`)
                             contentBlock.empty().append(`<p class="content">${newContent}</p>`);
                         },
-                        error: function (req, status, err) {
+                        error: async function (req, status, err) {
                             const res = req.responseJSON;
 
                             if (!res) return;
@@ -772,24 +823,24 @@
                                 $.ajax({
                                     url: `./api/auth/refresh`,
                                     method: 'post',
-                                    success: function (data) {
+                                    success: async function (data) {
                                         if (!data) return;
 
-                                        alert(data.message);
+                                        await showDialogAsync(data.message);
 
                                     },
-                                    error: function (req, status, err) {
+                                    error: async function (req, status, err) {
                                         const res = req.responseJSON;
 
                                         if (res && res.message)
-                                            alert(res.message);
+                                            await showDialogAsync(res.message);
 
                                         return;
                                     }
                                 });
                             } else {
                                 if (res.message) {
-                                    alert(res.message);
+                                    await showDialogAsync(res.message);
                                 }
                             }
 
@@ -811,7 +862,7 @@
                     });
 
                 },
-                error: function (req, status, err) {
+                error: async function (req, status, err) {
                     const res = req.responseJSON;
 
                     if (
@@ -821,17 +872,17 @@
                         $.ajax({
                             url: `./api/auth/refresh`,
                             method: 'post',
-                            success: function (data) {
+                            success: async function (data) {
                                 if (!data) return;
 
-                                alert(data.message);
+                                await showDialogAsync(data.message);
 
                             },
-                            error: function (req, status, err) {
+                            error: async function (req, status, err) {
                                 const res = req.responseJSON;
 
                                 if (res && res.message)
-                                    alert(res.message);
+                                    await showDialogAsync(res.message);
 
                                 return;
                             }
@@ -839,7 +890,7 @@
                     } else {
 
                         if (res && res.message)
-                            alert(res.message);
+                            await showDialogAsync(res.message);
                     }
 
 
@@ -851,11 +902,11 @@
         })
 
         // 댓글 수정 취소 버튼
-        $(document).on("click", ".comment-cancel-edit", function () {
+        $(document).on("click", ".comment-cancel-edit", async function () {
             const rootComment = $(this).closest('.comment');
 
             if (!rootComment) {
-                alert("해당 댓글을 찾을 수 없습니다.");
+                await showDialogAsync("해당 댓글을 찾을 수 없습니다.");
                 return;
             }
 
@@ -871,11 +922,11 @@
 
 
         // 댓글 삭제 버튼
-        $(document).on("click", ".comment-delete-btn", function () {
+        $(document).on("click", ".comment-delete-btn", async function () {
             const rootComment = $(this).closest('.comment');
 
             if (!rootComment) {
-                alert("해당 댓글을 찾을 수 없습니다.");
+                await showDialogAsync("해당 댓글을 찾을 수 없습니다.");
                 return;
             }
 
@@ -887,7 +938,7 @@
             $.ajax({
                 url: `./api/auth/profile`,
                 method: 'get',
-                success: function (data) {
+                success: async function (data) {
                     if (!data || !data.user) return;
 
                     user = data.user;
@@ -895,20 +946,20 @@
                     if (!user) return;
 
                     if (user.id !== writerId) {
-                        alert("작성자가 아닙니다.");
+                        await showDialogAsync("작성자가 아닙니다.");
                         return;
                     }
 
                     $.ajax({
                         url: `./api/comments/${commentId}`,
                         method: 'delete',
-                        success: function (data) {
+                        success: async function (data) {
                             if (data && data.message)
-                                alert(data.message);
+                                await showDialogAsync(data.message);
 
                             window.location.replace(`./detail.html?id=${postId}`);
                         },
-                        error: function (req, status, err) {
+                        error: async function (req, status, err) {
                             const res = req.responseJSON;
 
                             if (!res) return;
@@ -920,24 +971,24 @@
                                 $.ajax({
                                     url: `./api/auth/refresh`,
                                     method: 'post',
-                                    success: function (data) {
+                                    success: async function (data) {
                                         if (!data) return;
 
-                                        alert(data.message);
+                                        await showDialogAsync(data.message);
 
                                     },
-                                    error: function (req, status, err) {
+                                    error: async function (req, status, err) {
                                         const res = req.responseJSON;
 
                                         if (res && res.message)
-                                            alert(res.message);
+                                            await showDialogAsync(res.message);
 
                                         return;
                                     }
                                 });
                             } else {
                                 if (res.message) {
-                                    alert(res.message);
+                                    await showDialogAsync(res.message);
                                 }
                             }
 
@@ -959,7 +1010,7 @@
                     });
 
                 },
-                error: function (req, status, err) {
+                error: async function (req, status, err) {
                     const res = req.responseJSON;
 
                     if (
@@ -969,17 +1020,17 @@
                         $.ajax({
                             url: `./api/auth/refresh`,
                             method: 'post',
-                            success: function (data) {
+                            success: async function (data) {
                                 if (!data) return;
 
-                                alert(data.message);
+                                await showDialogAsync(data.message);
 
                             },
-                            error: function (req, status, err) {
+                            error: async function (req, status, err) {
                                 const res = req.responseJSON;
 
                                 if (res && res.message)
-                                    alert(res.message);
+                                    await showDialogAsync(res.message);
 
                                 return;
                             }
@@ -987,7 +1038,7 @@
                     } else {
 
                         if (res && res.message)
-                            alert(res.message);
+                            await showDialogAsync(res.message);
                     }
 
 
@@ -999,11 +1050,11 @@
         })
 
         // 페이지 버튼
-        $(document).on("click", ".page-btn", function () {
+        $(document).on("click", ".page-btn", async function () {
             const idx = Number($(this).data('id'));
 
             if (isNaN(idx)) {
-                alert("숫자 형식이 아닙니다.");
+                await showDialogAsync("숫자 형식이 아닙니다.");
                 return;
             }
 
@@ -1073,6 +1124,18 @@
 
         </div>
 
+    </div>
+    <div id="customDialog" class="dialog hidden">
+        <div class="dialog-content">
+            <p id="dialogMessage">메시지 내용</p>
+            <button id="dialogOk">확인</button>
+        </div>
+    </div>
+    <div id="customDialog" class="dialog hidden">
+        <div class="dialog-content">
+            <p id="dialogMessage">메시지 내용</p>
+            <button id="dialogOk">확인</button>
+        </div>
     </div>
 </body>
 

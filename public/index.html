@@ -133,16 +133,60 @@
         #pages button:hover {
             text-decoration: underline;
         }
+
+        .dialog {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dialog.hidden {
+            display: none;
+        }
+
+        .dialog-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
     </style>
     <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
     <script>
-        const root = 'http://localhost:3000/api';
+        function showDialog(message, callback) {
+            const dialog = document.getElementById('customDialog');
+            const dialogMessage = document.getElementById('dialogMessage');
+            const dialogOk = document.getElementById('dialogOk');
+
+            dialogMessage.textContent = message;
+            dialog.classList.remove('hidden');
+
+            function onOk() {
+                dialog.classList.add('hidden');
+                dialogOk.removeEventListener('click', onOk);
+                if (callback) callback();
+            }
+
+            dialogOk.addEventListener('click', onOk);
+        }
+
+        function showDialogAsync(message) {
+            return new Promise((resolve) => {
+                showDialog(message, resolve);
+            });
+        }
 
         let info;
         let pages;
         const groups = [];
 
-        $(document).ready(function () {
+        $(document).ready(async function () {
             info = document.getElementById("post-container");
             pages = document.getElementById("pages");
 
@@ -178,11 +222,11 @@
 
 
                 },
-                error: function (req, status, err) {
+                error: async function (req, status, err) {
                     const res = req.responseJSON;
 
                     if (res && res.message)
-                        alert(res.message);
+                        await showDialogAsync(res.message);
 
                     return;
                 }
@@ -198,7 +242,7 @@
                         window.location.href = "./post.html";
 
                     },
-                    error: function (req, status, err) {
+                    error: async function (req, status, err) {
                         const res = req.responseJSON;
 
                         if (
@@ -208,17 +252,17 @@
                             $.ajax({
                                 url: `./api/auth/refresh`,
                                 method: 'post',
-                                success: function (data) {
+                                success: async function (data) {
                                     if (!data) return;
 
-                                    alert(data.message);
+                                    await showDialogAsync(data.message);
 
                                 },
-                                error: function (req, status, err) {
+                                error: async function (req, status, err) {
                                     const res = req.responseJSON;
 
                                     if (res && res.message)
-                                        alert(res.message);
+                                        await showDialogAsync(res.message);
 
                                     return;
                                 }
@@ -227,7 +271,7 @@
 
 
                         if (res && res.message)
-                            alert(res.message);
+                            await showDialogAsync(res.message);
 
                         return;
                     }
@@ -238,11 +282,11 @@
         })
 
         // 페이지 클릭 이벤트
-        $(document).on("click", ".page-btn", function () {
+        $(document).on("click", ".page-btn", async function () {
             const idx = Number($(this).data('id'));
 
             if (isNaN(idx)) {
-                alert("숫자 형식이 아닙니다.");
+                await showDialogAsync("숫자 형식이 아닙니다.");
                 return;
             }
 
@@ -286,6 +330,12 @@
         </div>
     </div>
     <div id="pages">
+    </div>
+    <div id="customDialog" class="dialog hidden">
+        <div class="dialog-content">
+            <p id="dialogMessage">메시지 내용</p>
+            <button id="dialogOk">확인</button>
+        </div>
     </div>
 </body>
 
