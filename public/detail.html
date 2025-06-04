@@ -86,8 +86,6 @@
             color: gray;
         }
 
-        #post-info #author {}
-
         #post-btns {
             display: flex;
             justify-content: flex-end;
@@ -120,8 +118,6 @@
             border-bottom-width: 2px;
             border-bottom-style: solid;
         }
-
-        #comment-container {}
 
         .comment {
             border-bottom-color: rgb(255, 81, 81);
@@ -409,8 +405,28 @@
 
             // 댓글 제출 버튼
             $(document).on("click", "#submit-btn", function () {
-                if (!checkToken(decodedToken))
-                    return;
+                let user = null;
+
+                $.ajax({
+                    url: `./api/auth/profile`,
+                    method: 'get',
+                    success: function (data) {
+                        if (!data || !data.user) return;
+
+                        user = data.user;
+
+                    },
+                    error: function (req, status, err) {
+                        const res = req.responseJSON;
+
+                        if (res && res.message)
+                            alert(res.message);
+
+                        return;
+                    }
+                });
+
+                if (!user) return;
 
                 const commentContent = document.getElementById("content");
 
@@ -456,16 +472,66 @@
 
         // 수정 버튼
         $(document).on("click", "#edit-btn", function () {
-            if (!checkToken(decodedToken, postAuthorId))
+            let user = null;
+
+            $.ajax({
+                url: `./api/auth/profile`,
+                method: 'get',
+                success: function (data) {
+                    if (!data || !data.user) return;
+
+                    user = data.user;
+
+                },
+                error: function (req, status, err) {
+                    const res = req.responseJSON;
+
+                    if (res && res.message)
+                        alert(res.message);
+
+                    return;
+                }
+            });
+
+            if (!user) return;
+
+            if (user.id !== postAuthorId) {
+                alert("작성자가 아닙니다.");
                 return;
+            }
 
             window.location.replace(`./post.html?id=${postId}`);
         })
 
         // 삭제 버튼
         $(document).on("click", "#delete-btn", function () {
-            if (!checkToken(decodedToken, postAuthorId))
+            let user = null;
+
+            $.ajax({
+                url: `./api/auth/profile`,
+                method: 'get',
+                success: function (data) {
+                    if (!data || !data.user) return;
+
+                    user = data.user;
+
+                },
+                error: function (req, status, err) {
+                    const res = req.responseJSON;
+
+                    if (res && res.message)
+                        alert(res.message);
+
+                    return;
+                }
+            });
+
+            if (!user) return;
+
+            if (user.id !== postAuthorId) {
+                alert("작성자가 아닙니다.");
                 return;
+            }
 
             $.ajax({
                 url: `./api/posts/${postId}`,
@@ -513,8 +579,33 @@
             const commentId = rootComment.data('comment-id');
             const writerId = rootComment.data('author-id');
 
-            if (!checkToken(decodedToken, writerId))
+            let user = null;
+
+            $.ajax({
+                url: `./api/auth/profile`,
+                method: 'get',
+                success: function (data) {
+                    if (!data || !data.user) return;
+
+                    user = data.user;
+
+                },
+                error: function (req, status, err) {
+                    const res = req.responseJSON;
+
+                    if (res && res.message)
+                        alert(res.message);
+
+                    return;
+                }
+            });
+
+            if (!user) return;
+
+            if (user.id !== writerId) {
+                alert("작성자가 아닙니다.");
                 return;
+            }
 
             // 수정 화면 전환
             const commentContent = rootComment.find('.content').text();
@@ -540,8 +631,33 @@
             const commentId = rootComment.data('comment-id');
             const writerId = rootComment.data('author-id');
 
-            if (!checkToken(decodedToken, writerId))
+            let user = null;
+
+            $.ajax({
+                url: `./api/auth/profile`,
+                method: 'get',
+                success: function (data) {
+                    if (!data || !data.user) return;
+
+                    user = data.user;
+
+                },
+                error: function (req, status, err) {
+                    const res = req.responseJSON;
+
+                    if (res && res.message)
+                        alert(res.message);
+
+                    return;
+                }
+            });
+
+            if (!user) return;
+
+            if (user.id !== writerId) {
+                alert("작성자가 아닙니다.");
                 return;
+            }
 
             // 수정 적용
             const newContent = rootComment.find('.edit-input').val();
@@ -604,8 +720,33 @@
             const commentId = rootComment.data('comment-id');
             const writerId = rootComment.data('author-id');
 
-            if (!checkToken(decodedToken, writerId))
+            let user = null;
+
+            $.ajax({
+                url: `./api/auth/profile`,
+                method: 'get',
+                success: function (data) {
+                    if (!data || !data.user) return;
+
+                    user = data.user;
+
+                },
+                error: function (req, status, err) {
+                    const res = req.responseJSON;
+
+                    if (res && res.message)
+                        alert(res.message);
+
+                    return;
+                }
+            });
+
+            if (!user) return;
+
+            if (user.id !== writerId) {
+                alert("작성자가 아닙니다.");
                 return;
+            }
 
             // 수정 취소
             const commentBtns = rootComment.find('.comment-btns');
@@ -630,8 +771,33 @@
             const commentId = rootComment.data('comment-id');
             const writerId = rootComment.data('author-id');
 
-            if (!checkToken(decodedToken, writerId))
+            let user = null;
+
+            $.ajax({
+                url: `./api/auth/profile`,
+                method: 'get',
+                success: function (data) {
+                    if (!data || !data.user) return;
+
+                    user = data.user;
+
+                },
+                error: function (req, status, err) {
+                    const res = req.responseJSON;
+
+                    if (res && res.message)
+                        alert(res.message);
+
+                    return;
+                }
+            });
+
+            if (!user) return;
+
+            if (user.id !== writerId) {
+                alert("작성자가 아닙니다.");
                 return;
+            }
 
             $.ajax({
                 url: `./api/comments/${commentId}`,
