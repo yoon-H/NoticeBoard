@@ -254,6 +254,10 @@ router.put("/posts/:postId", authMiddleware, async (req, res, next) => {
         .status(404)
         .json({ deletedCode: "post", message: "삭제된 게시글입니다." });
 
+    if (post.userId !== author) {
+      return res.status(403).json({ message: "작성자가 아닙니다." });
+    }
+
     const obj = {
       title,
       content: sanitizePost(content),
@@ -330,6 +334,10 @@ router.delete("/posts/:postId", authMiddleware, async (req, res, next) => {
       return res
         .status(404)
         .json({ deletedCode: "post", message: "삭제된 게시글입니다." });
+
+    if (post.userId !== author) {
+      return res.status(403).json({ message: "작성자가 아닙니다." });
+    }
 
     const obj = {
       id: postId,
