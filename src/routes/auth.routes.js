@@ -3,6 +3,7 @@ import { config } from "../config/config.js";
 import bcrypt from "bcrypt";
 import { createUser, findUserByLoginId } from "../db/query/user/user.db.js";
 import { generateToken } from "../utils/token.js";
+import { authMiddleware } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
@@ -159,6 +160,10 @@ router.post("/auth/login", async (req, res, next) => {
   } catch (err) {
     next(err);
   }
+});
+
+app.get("/api/user/profile", authMiddleware, (req, res) => {
+  res.json(req.user);
 });
 
 export default router;
