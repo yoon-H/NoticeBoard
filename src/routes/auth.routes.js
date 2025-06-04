@@ -162,8 +162,8 @@ router.post("/auth/login", async (req, res, next) => {
   }
 });
 
-app.get("/api/user/profile", authMiddleware, (req, res) => {
-  res.json(req.user);
+router.get("/auth/profile", authMiddleware, (req, res) => {
+  return res.status(200).json({ user: req.user });
 });
 
 export default router;
