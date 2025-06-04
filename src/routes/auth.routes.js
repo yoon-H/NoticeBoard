@@ -1,9 +1,17 @@
 import { Router } from "express";
 import { config } from "../config/config.js";
+import dotenv from "dotenv";
 import bcrypt from "bcrypt";
-import { createUser, findUserByLoginId } from "../db/query/user/user.db.js";
+import {
+  createUser,
+  findUserById,
+  findUserByLoginId,
+} from "../db/query/user/user.db.js";
 import { generateToken } from "../utils/token.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
+import jwt from "jsonwebtoken";
+
+dotenv.config();
 
 const router = Router();
 
@@ -148,12 +156,18 @@ router.post("/auth/login", async (req, res, next) => {
     if (!(await bcrypt.compare(password, user.password)))
       return res.status(400).json({ message: "비밀번호가 일치하지 않습니다." });
 
+    const refreshToken = generateToken(user.id, true);
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      sameSite: "Strict",
+      maxAge: 1000 * 60 * 60 * 24 * 7,
+    });
+
     const token = generateToken(user.id);
     res.cookie("authorization", `Bearer ${token}`, {
       httpOnly: true,
-      secure: true,
       sameSite: "Strict",
-      maxAge: 1000 * 60 * 30,
+      maxAge: 1000 * 60 * 10,
     });
 
     return res.status(200).json({ message: "로그인이 완료되었습니다." });
@@ -164,6 +178,39 @@ router.post("/auth/login", async (req, res, next) => {
 
 router.get("/auth/profile", authMiddleware, (req, res) => {
   return res.status(200).json({ user: req.user });
+});
+
+router.post("/auth/refresh", async (req, res) => {
+  try {
+    const { refreshToken } = req.cookies;
+
+    if (!refreshToken)
+      return res.status(401).json({ message: "토큰이 존재하지 않습니다." });
+
+    const data = jwt.verify(refreshToken, process.env.REFRESH_KEY);
+
+    const id = data.userId;
+
+    const user = await findUserById(id);
+
+    if (!user)
+      return res.status(401).json({ message: "존재하지 않는 사용자입니다." });
+
+    const newAccessToken = jwt.sign({ userId: user.id }, process.env.JWT_KEY, {
+      expiresIn: "10m",
+    });
+
+    res.cookie("authorization", `Bearer ${newAccessToken}`, {
+      httpOnly: true,
+      sameSite: "Strict",
+      maxAge: 1000 * 60 * 10,
+    });
+
+    return res.status(200).json({ message: "토큰을 재발급했습니다." });
+  } catch (err) {
+    console.log(err);
+    return res.status(401).json({ message: "Refresh Token 만료 또는 위조" });
+  }
 });
 
 export default router;

@@ -7,7 +7,7 @@ export const authMiddleware = async (req, res, next) => {
   try {
     const { authorization } = req.cookies;
     if (!authorization)
-      return res.status(401).json({ message: "토큰이 존재하지 않습니다." });
+      return res.status(401).json({ message: "토큰이 만료되었습니다." });
 
     const [tokenType, token] = authorization.split(" ");
 
