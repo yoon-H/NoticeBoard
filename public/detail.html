@@ -86,8 +86,6 @@
             color: gray;
         }
 
-        #post-info #author {}
-
         #post-btns {
             display: flex;
             justify-content: flex-end;
@@ -120,8 +118,6 @@
             border-bottom-width: 2px;
             border-bottom-style: solid;
         }
-
-        #comment-container {}
 
         .comment {
             border-bottom-color: rgb(255, 81, 81);
@@ -209,13 +205,81 @@
         #submit-btn:hover {
             background-color: crimson;
         }
+
+        .dialog {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dialog.hidden {
+            display: none;
+        }
+
+        .dialog-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .dialog {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dialog.hidden {
+            display: none;
+        }
+
+        .dialog-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
     </style>
     <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
     <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
     <script>
+        function showDialog(message, callback) {
+            const dialog = document.getElementById('customDialog');
+            const dialogMessage = document.getElementById('dialogMessage');
+            const dialogOk = document.getElementById('dialogOk');
+
+            dialogMessage.textContent = message;
+            dialog.classList.remove('hidden');
+
+            function onOk() {
+                dialog.classList.add('hidden');
+                dialogOk.removeEventListener('click', onOk);
+                if (callback) callback();
+            }
+
+            dialogOk.addEventListener('click', onOk);
+        }
+
+        function showDialogAsync(message) {
+            return new Promise((resolve) => {
+                showDialog(message, resolve);
+            });
+        }
+
         let token;
         let decodedToken;
-        const root = 'http://localhost:3000/api';
 
         // 글 아이디 추출
         const params = new URLSearchParams(window.location.search);
@@ -226,31 +290,6 @@
         let pages;
         const groups = [];
         let commentContainer;
-
-        function checkToken(token, authorId = null) {
-            if (!token) {
-                alert("로그인을 해주세요.");
-                return false;
-            }
-
-            if (authorId === null)
-                return true;
-
-            if (token.userId !== authorId) {
-                alert("작성자가 아닙니다.");
-                return false;
-            }
-
-            const currentTime = Math.floor(Date.now() / 1000);
-
-            if (token.exp && token.exp < currentTime) {
-                alert("토큰이 만료되었습니다.");
-                console.log("토큰이 만료되었습니다.");
-                return false;
-            }
-
-            return true;
-        }
 
         function formatDate(date) {
             return new Date(date).toLocaleString("ko-KR", {
@@ -269,23 +308,6 @@
         }
 
         $(document).ready(function () {
-            // 토큰 가져오기
-            const cookies = document.cookie.split(';');
-            const name = "authorization";
-
-            if (cookies) {
-                for (let cookie of cookies) {
-                    const [key, value] = cookie.trim().split('=');
-                    if (key === name) {
-                        token = value;
-                        break;
-                    };
-                }
-
-                if (token)
-                    decodedToken = jwt_decode(token);
-            }
-
             // 글 element
             const title = document.getElementById("title");
             const postTime = document.getElementById("post-time");
@@ -324,13 +346,13 @@
                         fileRoot.insertAdjacentHTML("afterbegin", html);
                     }
                 },
-                error: function (req, status, err) {
+                error: async function (req, status, err) {
                     const res = req.responseJSON;
 
                     if (!res) return;
 
                     if (res.message) {
-                        alert(res.message);
+                        await showDialogAsync(res.message);
                     }
 
                     if (res.deletedCode) {
@@ -397,11 +419,11 @@
                         );
                     }
                 },
-                error: function (req, status, err) {
+                error: async function (req, status, err) {
                     const res = req.responseJSON;
 
                     if (res && res.message)
-                        alert(res.message);
+                        await showDialogAsync(res.message);
 
                     return;
                 }
@@ -409,8 +431,6 @@
 
             // 댓글 제출 버튼
             $(document).on("click", "#submit-btn", function () {
-                if (!checkToken(decodedToken))
-                    return;
 
                 const commentContent = document.getElementById("content");
 
@@ -421,20 +441,46 @@
                     data: {
                         content: commentContent.value,
                     },
-                    success: function (data) {
+                    success: async function (data) {
                         if (data && data.message)
-                            alert(data.message);
+                            await showDialogAsync(data.message);
 
                         window.location.replace(`./detail.html?id=${postId}`);
                     },
-                    error: function (req, status, err) {
+                    error: async function (req, status, err) {
                         const res = req.responseJSON;
 
                         if (!res) return;
 
-                        if (res.message) {
-                            alert(res.message);
+                        if (
+                            req.status === 401 &&
+                            res.message === "토큰이 만료되었습니다."
+                        ) {
+                            $.ajax({
+                                url: `./api/auth/refresh`,
+                                method: 'post',
+                                success: async function (data) {
+                                    if (!data) return;
+
+                                    await showDialogAsync(data.message);
+
+                                },
+                                error: async function (req, status, err) {
+                                    const res = req.responseJSON;
+
+                                    if (res && res.message)
+                                        await showDialogAsync(res.message);
+
+                                    return;
+                                }
+                            });
+                        } else {
+                            if (res.message) {
+                                await showDialogAsync(res.message);
+                            }
                         }
+
+
 
                         if (res.deletedCode) {
                             switch (res.deletedCode) {
@@ -456,156 +502,413 @@
 
         // 수정 버튼
         $(document).on("click", "#edit-btn", function () {
-            if (!checkToken(decodedToken, postAuthorId))
-                return;
+            let user = null;
 
-            window.location.replace(`./post.html?id=${postId}`);
+            $.ajax({
+                url: `./api/auth/profile`,
+                method: 'get',
+                success: async function (data) {
+                    if (!data || !data.user) return;
+
+                    user = data.user;
+
+                    if (!user) return;
+
+                    if (user.id !== postAuthorId) {
+                        await showDialogAsync("작성자가 아닙니다.");
+                        return;
+                    }
+
+                    window.location.replace(`./post.html?id=${postId}`);
+
+                },
+                error: async function (req, status, err) {
+                    const res = req.responseJSON;
+
+                    if (
+                        req.status === 401 &&
+                        res.message === "토큰이 만료되었습니다."
+                    ) {
+                        console.log("토큰 만료")
+                        $.ajax({
+                            url: `./api/auth/refresh`,
+                            method: 'post',
+                            success: async function (data) {
+                                if (!data) return;
+
+                                await showDialogAsync(data.message);
+
+                            },
+                            error: async function (req, status, err) {
+                                const res = req.responseJSON;
+
+                                if (res && res.message)
+                                    await showDialogAsync(res.message);
+
+                                return;
+                            }
+                        });
+                    } else {
+                        if (res && res.message)
+                            await showDialogAsync(res.message);
+
+                    }
+
+
+                    return;
+                }
+            });
+
         })
 
         // 삭제 버튼
         $(document).on("click", "#delete-btn", function () {
-            if (!checkToken(decodedToken, postAuthorId))
-                return;
+            let user = null;
 
             $.ajax({
-                url: `./api/posts/${postId}`,
-                method: 'delete',
-                success: function (data) {
-                    if (data && data.message)
-                        alert(data.message);
+                url: `./api/auth/profile`,
+                method: 'get',
+                success: async function (data) {
+                    if (!data || !data.user) return;
 
-                    window.location.replace('./index.html');
+                    user = data.user;
+
+
+                    if (!user) return;
+
+                    if (user.id !== postAuthorId) {
+                        await showDialogAsync("작성자가 아닙니다.");
+                        return;
+                    }
+
+                    $.ajax({
+                        url: `./api/posts/${postId}`,
+                        method: 'delete',
+                        success: async function (data) {
+                            if (data && data.message)
+                                await showDialogAsync(data.message);
+
+                            window.location.replace('./index.html');
+                        },
+                        error: async function (req, status, err) {
+                            const res = req.responseJSON;
+
+                            if (!res) return;
+
+                            if (
+                                req.status === 401 &&
+                                res.message === "토큰이 만료되었습니다."
+                            ) {
+                                $.ajax({
+                                    url: `./api/auth/refresh`,
+                                    method: 'post',
+                                    success: async function (data) {
+                                        if (!data) return;
+
+                                        await showDialogAsync(data.message);
+
+                                    },
+                                    error: async function (req, status, err) {
+                                        const res = req.responseJSON;
+
+                                        if (res && res.message)
+                                            await showDialogAsync(res.message);
+
+                                        return;
+                                    }
+                                });
+                            } else {
+                                if (res.message) {
+                                    await showDialogAsync(res.message);
+                                }
+                            }
+
+
+
+                            if (res.deletedCode) {
+                                switch (res.deletedCode) {
+                                    case 'post':
+                                        window.location.replace(`./index.html`);
+                                        break;
+                                    case 'comment':
+                                        window.location.replace(`./detail.html?id=${postId}`);
+                                        break;
+                                }
+                            }
+
+                            return;
+                        }
+                    });
+
                 },
-                error: function (req, status, err) {
+                error: async function (req, status, err) {
                     const res = req.responseJSON;
 
-                    if (!res) return;
+                    if (
+                        req.status === 401 &&
+                        res.message === "토큰이 만료되었습니다."
+                    ) {
+                        $.ajax({
+                            url: `./api/auth/refresh`,
+                            method: 'post',
+                            success: async function (data) {
+                                if (!data) return;
 
-                    if (res.message) {
-                        alert(res.message);
+                                await showDialogAsync(data.message);
+
+                            },
+                            error: async function (req, status, err) {
+                                const res = req.responseJSON;
+
+                                if (res && res.message)
+                                    await showDialogAsync(res.message);
+
+                                return;
+                            }
+                        });
+                    } else {
+
+                        if (res && res.message)
+                            await showDialogAsync(res.message);
                     }
 
-                    if (res.deletedCode) {
-                        switch (res.deletedCode) {
-                            case 'post':
-                                window.location.replace(`./index.html`);
-                                break;
-                            case 'comment':
-                                window.location.replace(`./detail.html?id=${postId}`);
-                                break;
-                        }
-                    }
 
                     return;
                 }
             });
+
         })
 
         // 댓글 수정 버튼
-        $(document).on("click", ".comment-edit-btn", function () {
+        $(document).on("click", ".comment-edit-btn", async function () {
             const rootComment = $(this).closest('.comment');
 
             if (!rootComment) {
-                alert("해당 댓글을 찾을 수 없습니다.");
+                await showDialogAsync("해당 댓글을 찾을 수 없습니다.");
                 return;
             }
 
             const commentId = rootComment.data('comment-id');
             const writerId = rootComment.data('author-id');
 
-            if (!checkToken(decodedToken, writerId))
-                return;
-
-            // 수정 화면 전환
-            const commentContent = rootComment.find('.content').text();
-
-            const commentBtns = rootComment.find('.comment-btns');
-            const contentBlock = rootComment.find('.comment-content');
-            contentBlock.attr('data-original', commentContent);
-
-            commentBtns.empty().append(`<button type="button" class="comment-complete-edit">수정</button>
-                        <button type="button" class="comment-cancel-edit">취소</button>`)
-            contentBlock.empty().append(`<textarea class="edit-input">${commentContent}</textarea>`);
-        })
-
-        // 댓글 수정 완료 버튼
-        $(document).on("click", ".comment-complete-edit", function () {
-            const rootComment = $(this).closest('.comment');
-
-            if (!rootComment) {
-                alert("해당 댓글을 찾을 수 없습니다.");
-                return;
-            }
-
-            const commentId = rootComment.data('comment-id');
-            const writerId = rootComment.data('author-id');
-
-            if (!checkToken(decodedToken, writerId))
-                return;
-
-            // 수정 적용
-            const newContent = rootComment.find('.edit-input').val();
+            let user = null;
 
             $.ajax({
-                url: `./api/comments/${commentId}`,
-                method: 'put',
-                dataType: 'json',
-                data: {
-                    content: newContent,
-                },
-                success: function (data) {
-                    if (data && data.message)
-                        alert(data.message);
+                url: `./api/auth/profile`,
+                method: 'get',
+                success: async function (data) {
+                    if (!data || !data.user) return;
+
+                    user = data.user;
+
+                    if (!user) return;
+
+                    if (user.id !== writerId) {
+                        await showDialogAsync("작성자가 아닙니다.");
+                        return;
+                    }
+
+                    // 수정 화면 전환
+                    const commentContent = rootComment.find('.content').text();
 
                     const commentBtns = rootComment.find('.comment-btns');
                     const contentBlock = rootComment.find('.comment-content');
-                    const authorBlock = rootComment.find('.time');
+                    contentBlock.attr('data-original', commentContent);
 
-                    authorBlock.text(formatDate(data.time) + '(수정됨)');
+                    commentBtns.empty().append(`<button type="button" class="comment-complete-edit">수정</button>
+                        <button type="button" class="comment-cancel-edit">취소</button>`)
+                    contentBlock.empty().append(`<textarea class="edit-input">${commentContent}</textarea>`);
 
-                    commentBtns.empty().append(`<button type="button" class="comment-edit-btn">수정</button>
-                        <button type="button" class="comment-delete-btn">삭제</button>`)
-                    contentBlock.empty().append(`<p class="content">${newContent}</p>`);
                 },
-                error: function (req, status, err) {
+                error: async function (req, status, err) {
                     const res = req.responseJSON;
 
-                    if (!res) return;
+                    if (
+                        req.status === 401 &&
+                        res.message === "토큰이 만료되었습니다."
+                    ) {
+                        $.ajax({
+                            url: `./api/auth/refresh`,
+                            method: 'post',
+                            success: async function (data) {
+                                if (!data) return;
 
-                    if (res.message) {
-                        alert(res.message);
+                                await showDialogAsync(data.message);
+
+                            },
+                            error: async function (req, status, err) {
+                                const res = req.responseJSON;
+
+                                if (res && res.message)
+                                    await showDialogAsync(res.message);
+
+                                return;
+                            }
+                        });
+                    } else {
+
+                        if (res && res.message)
+                            await showDialogAsync(res.message);
                     }
 
-                    if (res.deletedCode) {
-                        switch (res.deletedCode) {
-                            case 'post':
-                                window.location.replace(`./index.html`);
-                                break;
-                            case 'comment':
-                                window.location.replace(`./detail.html?id=${postId}`);
-                                break;
-                        }
-                    }
 
                     return;
                 }
             });
+
         })
 
-        // 댓글 수정 취소 버튼
-        $(document).on("click", ".comment-cancel-edit", function () {
+        // 댓글 수정 완료 버튼
+        $(document).on("click", ".comment-complete-edit", async function () {
             const rootComment = $(this).closest('.comment');
 
             if (!rootComment) {
-                alert("해당 댓글을 찾을 수 없습니다.");
+                await showDialogAsync("해당 댓글을 찾을 수 없습니다.");
                 return;
             }
 
             const commentId = rootComment.data('comment-id');
             const writerId = rootComment.data('author-id');
 
-            if (!checkToken(decodedToken, writerId))
+            let user = null;
+
+            $.ajax({
+                url: `./api/auth/profile`,
+                method: 'get',
+                success: async function (data) {
+                    if (!data || !data.user) return;
+
+                    user = data.user;
+
+                    if (!user) return;
+
+                    if (user.id !== writerId) {
+                        await showDialogAsync("작성자가 아닙니다.");
+                        return;
+                    }
+
+                    // 수정 적용
+                    const newContent = rootComment.find('.edit-input').val();
+
+                    $.ajax({
+                        url: `./api/comments/${commentId}`,
+                        method: 'put',
+                        dataType: 'json',
+                        data: {
+                            content: newContent,
+                        },
+                        success: async function (data) {
+                            if (data && data.message)
+                                await showDialogAsync(data.message);
+
+                            const commentBtns = rootComment.find('.comment-btns');
+                            const contentBlock = rootComment.find('.comment-content');
+                            const authorBlock = rootComment.find('.time');
+
+                            authorBlock.text(formatDate(data.time) + '(수정됨)');
+
+                            commentBtns.empty().append(`<button type="button" class="comment-edit-btn">수정</button>
+                        <button type="button" class="comment-delete-btn">삭제</button>`)
+                            contentBlock.empty().append(`<p class="content">${newContent}</p>`);
+                        },
+                        error: async function (req, status, err) {
+                            const res = req.responseJSON;
+
+                            if (!res) return;
+
+                            if (
+                                req.status === 401 &&
+                                res.message === "토큰이 만료되었습니다."
+                            ) {
+                                $.ajax({
+                                    url: `./api/auth/refresh`,
+                                    method: 'post',
+                                    success: async function (data) {
+                                        if (!data) return;
+
+                                        await showDialogAsync(data.message);
+
+                                    },
+                                    error: async function (req, status, err) {
+                                        const res = req.responseJSON;
+
+                                        if (res && res.message)
+                                            await showDialogAsync(res.message);
+
+                                        return;
+                                    }
+                                });
+                            } else {
+                                if (res.message) {
+                                    await showDialogAsync(res.message);
+                                }
+                            }
+
+
+
+                            if (res.deletedCode) {
+                                switch (res.deletedCode) {
+                                    case 'post':
+                                        window.location.replace(`./index.html`);
+                                        break;
+                                    case 'comment':
+                                        window.location.replace(`./detail.html?id=${postId}`);
+                                        break;
+                                }
+                            }
+
+                            return;
+                        }
+                    });
+
+                },
+                error: async function (req, status, err) {
+                    const res = req.responseJSON;
+
+                    if (
+                        req.status === 401 &&
+                        res.message === "토큰이 만료되었습니다."
+                    ) {
+                        $.ajax({
+                            url: `./api/auth/refresh`,
+                            method: 'post',
+                            success: async function (data) {
+                                if (!data) return;
+
+                                await showDialogAsync(data.message);
+
+                            },
+                            error: async function (req, status, err) {
+                                const res = req.responseJSON;
+
+                                if (res && res.message)
+                                    await showDialogAsync(res.message);
+
+                                return;
+                            }
+                        });
+                    } else {
+
+                        if (res && res.message)
+                            await showDialogAsync(res.message);
+                    }
+
+
+                    return;
+                }
+            });
+
+
+        })
+
+        // 댓글 수정 취소 버튼
+        $(document).on("click", ".comment-cancel-edit", async function () {
+            const rootComment = $(this).closest('.comment');
+
+            if (!rootComment) {
+                await showDialogAsync("해당 댓글을 찾을 수 없습니다.");
                 return;
+            }
 
             // 수정 취소
             const commentBtns = rootComment.find('.comment-btns');
@@ -619,60 +922,139 @@
 
 
         // 댓글 삭제 버튼
-        $(document).on("click", ".comment-delete-btn", function () {
+        $(document).on("click", ".comment-delete-btn", async function () {
             const rootComment = $(this).closest('.comment');
 
             if (!rootComment) {
-                alert("해당 댓글을 찾을 수 없습니다.");
+                await showDialogAsync("해당 댓글을 찾을 수 없습니다.");
                 return;
             }
 
             const commentId = rootComment.data('comment-id');
             const writerId = rootComment.data('author-id');
 
-            if (!checkToken(decodedToken, writerId))
-                return;
+            let user = null;
 
             $.ajax({
-                url: `./api/comments/${commentId}`,
-                method: 'delete',
-                success: function (data) {
-                    if (data && data.message)
-                        alert(data.message);
+                url: `./api/auth/profile`,
+                method: 'get',
+                success: async function (data) {
+                    if (!data || !data.user) return;
 
-                    window.location.replace(`./detail.html?id=${postId}`);
+                    user = data.user;
+
+                    if (!user) return;
+
+                    if (user.id !== writerId) {
+                        await showDialogAsync("작성자가 아닙니다.");
+                        return;
+                    }
+
+                    $.ajax({
+                        url: `./api/comments/${commentId}`,
+                        method: 'delete',
+                        success: async function (data) {
+                            if (data && data.message)
+                                await showDialogAsync(data.message);
+
+                            window.location.replace(`./detail.html?id=${postId}`);
+                        },
+                        error: async function (req, status, err) {
+                            const res = req.responseJSON;
+
+                            if (!res) return;
+
+                            if (
+                                req.status === 401 &&
+                                res.message === "토큰이 만료되었습니다."
+                            ) {
+                                $.ajax({
+                                    url: `./api/auth/refresh`,
+                                    method: 'post',
+                                    success: async function (data) {
+                                        if (!data) return;
+
+                                        await showDialogAsync(data.message);
+
+                                    },
+                                    error: async function (req, status, err) {
+                                        const res = req.responseJSON;
+
+                                        if (res && res.message)
+                                            await showDialogAsync(res.message);
+
+                                        return;
+                                    }
+                                });
+                            } else {
+                                if (res.message) {
+                                    await showDialogAsync(res.message);
+                                }
+                            }
+
+
+
+                            if (res.deletedCode) {
+                                switch (res.deletedCode) {
+                                    case 'post':
+                                        window.location.replace(`./index.html`);
+                                        break;
+                                    case 'comment':
+                                        window.location.replace(`./detail.html?id=${postId}`);
+                                        break;
+                                }
+                            }
+
+                            return;
+                        }
+                    });
+
                 },
-                error: function (req, status, err) {
+                error: async function (req, status, err) {
                     const res = req.responseJSON;
 
-                    if (!res) return;
+                    if (
+                        req.status === 401 &&
+                        res.message === "토큰이 만료되었습니다."
+                    ) {
+                        $.ajax({
+                            url: `./api/auth/refresh`,
+                            method: 'post',
+                            success: async function (data) {
+                                if (!data) return;
 
-                    if (res.message) {
-                        alert(res.message);
+                                await showDialogAsync(data.message);
+
+                            },
+                            error: async function (req, status, err) {
+                                const res = req.responseJSON;
+
+                                if (res && res.message)
+                                    await showDialogAsync(res.message);
+
+                                return;
+                            }
+                        });
+                    } else {
+
+                        if (res && res.message)
+                            await showDialogAsync(res.message);
                     }
 
-                    if (res.deletedCode) {
-                        switch (res.deletedCode) {
-                            case 'post':
-                                window.location.replace(`./index.html`);
-                                break;
-                            case 'comment':
-                                window.location.replace(`./detail.html?id=${postId}`);
-                                break;
-                        }
-                    }
 
                     return;
                 }
             });
+
+
         })
 
         // 페이지 버튼
-        $(document).on("click", ".page-btn", function () {
+        $(document).on("click", ".page-btn", async function () {
             const idx = Number($(this).data('id'));
 
             if (isNaN(idx)) {
-                alert("숫자 형식이 아닙니다.");
+                await showDialogAsync("숫자 형식이 아닙니다.");
                 return;
             }
 
@@ -742,6 +1124,18 @@
 
         </div>
 
+    </div>
+    <div id="customDialog" class="dialog hidden">
+        <div class="dialog-content">
+            <p id="dialogMessage">메시지 내용</p>
+            <button id="dialogOk">확인</button>
+        </div>
+    </div>
+    <div id="customDialog" class="dialog hidden">
+        <div class="dialog-content">
+            <p id="dialogMessage">메시지 내용</p>
+            <button id="dialogOk">확인</button>
+        </div>
     </div>
 </body>
 
