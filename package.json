@@ -5,6 +5,7 @@
     "start:server": "node src/server.js"
   },
   "dependencies": {
+    "@vitejs/plugin-react": "^4.5.2",
     "bcrypt": "^6.0.0",
     "cheerio": "^1.0.0",
     "cookie-parser": "^1.4.7",
@@ -16,6 +17,7 @@
     "mysql2": "^3.14.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-router-dom": "^7.6.2",
     "sanitize-html": "^2.17.0",
     "uuid": "^11.1.0"
   },
