@@ -7,8 +7,6 @@ import Login from "./pages/Login.jsx";
 import Nav from "./components/Nav.jsx";
 
 export default function App() {
-  console.log("app");
-
   return (
     <BrowserRouter>
       <Nav />
@@ -17,7 +15,7 @@ export default function App() {
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
         {/* <Route path="/mypage" element={<Mypage/>} /> TODO */}
-        <Route path="/detail" element={<Detail />} />
+        <Route path="/detail/:id" element={<Detail />} />
         <Route path="/post" element={<Post />} />
       </Routes>
     </BrowserRouter>
