@@ -1,50 +1,58 @@
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
 import "../css/home.css";
+import PostList from "../components/PostList.jsx";
+import Page from "../components/Page.jsx";
 
 export default function Home() {
   const [postDatas, setPostDatas] = useState([]);
+  const [activePage, setActivePage] = useState(1);
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
-    axios
-      .get("/api/posts")
-      .then((res) => {
-        setPostDatas(res.data);
-        console.log(res);
-      })
-      .catch((err) => console.error(err));
+    const param = parseInt(searchParams.get("page") || "1", 10);
+    setActivePage(param);
+  }, [searchParams]);
+
+  useEffect(() => {
+    const getPosts = async () => {
+      try {
+        const res = await axios.get("/api/posts");
+        setPostDatas(res.data.reverse());
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    getPosts();
   }, []);
 
-  let posts;
-  if (postDatas) {
-    posts = postDatas.map((data) => {
-      return (
-        <div className="post">
-          <p className="number">{data.id}</p>
-          <Link to="/detail" className="title">
-            {data.title}
-          </Link>
-          <p className="author">{data.author}</p>
-        </div>
-      );
-    });
+  const groups = [];
+
+  for (let i = 0; i < postDatas.length; i += 10) {
+    groups.push(postDatas.slice(i, i + 10));
   }
 
   return (
     <>
-      <Link to="/post">글쓰기</Link>
-      <div id="post-list">
-        <div className="post" id="info">
-          <p className="number">번호</p>
-          <p className="title">제목</p>
-          <p className="author">저자</p>
+      <div className="board-container">
+        <div className="board-header">
+          <Link to="/post" className="write-btn">
+            글쓰기
+          </Link>
         </div>
-        <div id="post-container">
-          {posts}
+        <div className="post-list">
+          <div className="post">
+            <p className="number">번호</p>
+            <p className="title">제목</p>
+            <p className="author">저자</p>
+          </div>
+          <PostList list={groups[activePage - 1] || []} />
         </div>
       </div>
+      <Page totalPages={groups.length} currentPage={activePage} />
     </>
   );
 }
