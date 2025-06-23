@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 
-export default function Status(isLoggedIn) {
+export default function Status({ isLoggedIn }) {
   let btn1;
   let btn2;
 

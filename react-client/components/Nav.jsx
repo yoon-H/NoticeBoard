@@ -4,8 +4,8 @@ import { useState } from "react";
 
 import "../css/nav.css";
 
-export default function Nav() {
-  const [isLoggedIn, setIsLoggendIn] = useState(false);
+export default function Nav({isLoggedIn}) {
+  
 
   return (
     <div>
