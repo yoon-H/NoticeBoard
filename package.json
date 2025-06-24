@@ -5,6 +5,9 @@
     "start:server": "node src/server.js"
   },
   "dependencies": {
+    "@tiptap/extension-image": "^2.22.3",
+    "@tiptap/react": "^2.22.3",
+    "@tiptap/starter-kit": "^2.22.3",
     "@vitejs/plugin-react": "^4.5.2",
     "axios": "^1.10.0",
     "bcrypt": "^6.0.0",
