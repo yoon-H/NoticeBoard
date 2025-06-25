@@ -7,9 +7,10 @@ import { useState } from "react";
 import Focus from "@tiptap/extension-focus";
 
 import EditorToolbar from "../components/EditorToolbar.jsx";
-import "../css/post.css";
+import styles from "../css/post.module.css";
 
 export default function Post() {
+  const navigate = useNavigate();
   const params = useParams();
   let postId = params.id;
 
@@ -65,19 +66,18 @@ export default function Post() {
     try {
       const data = {
         title: title,
-        content: editor.getText,
+        content: editor.getText(),
         files: [],
       };
 
       if (isEditing) {
         await axios.put(data);
       } else {
-        const res = await axios.post(`/api/posts`,data);
+        const res = await axios.post(`/api/posts`, data);
 
-        if (res.id) postId = res.id;
+        if (res.data.id) postId = res.data.id;
       }
 
-      const navigate = useNavigate();
       navigate(`/detail/${postId}`);
     } catch (err) {
       console.log(err);
@@ -87,32 +87,36 @@ export default function Post() {
 
   return (
     <>
-      <div id="post-container">
-        <div id="post-header">
+      <div className={styles["post-container"]}>
+        <div className={styles["post-header"]}>
           <input
             type="text"
-            id="title"
             name="title"
+            className={styles["title"]}
             placeholder="제목"
             value={title}
             onChange={onChange}
           />
         </div>
-        <div id="post-files">
-          <input type="file" id="attachment-header" multiple />
+        <div className={styles["post-files"]}>
+          <input type="file" className={styles["attachment-header"]} multiple />
         </div>
         <EditorToolbar editor={editor}></EditorToolbar>
         <EditorContent
-          id="tiptap"
-          className="tiptap"
+          className={styles["tiptap"]}
           editor={editor}
+          placeholder="내용을 입력해주세요."
           onClick={() => editor?.commands.focus()}
         />
-        <div id="post-content">
-          <div id="editor"></div>
+        <div className={styles["post-content"]}>
+          <div className={styles["editor"]}></div>
         </div>
-        <div id="submit">
-          <button type="submit" id="submit-btn" onClick={submitPost}>
+        <div className={styles["submit"]}>
+          <button
+            type="submit"
+            className={styles["submit-btn"]}
+            onClick={submitPost}
+          >
             제출
           </button>
         </div>
