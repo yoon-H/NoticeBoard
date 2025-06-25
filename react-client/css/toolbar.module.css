@@ -1,0 +1,23 @@
+.button-group {
+    margin-top: 10px;
+    margin-bottom: 10px;
+
+  button {
+    width: 40px;
+    height: 30px;
+    text-align: center;
+    padding: 0;
+
+    border-color: #ff7b7b;
+    border-style: solid;
+    border-radius: 7px;
+    background-color: white;
+
+    cursor: pointer;
+  }
+
+  button.is-active {
+    background-color: #ff7b7b;
+    transition: 0.3s;
+  }
+}

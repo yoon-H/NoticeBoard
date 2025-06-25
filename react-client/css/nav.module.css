@@ -1,0 +1,49 @@
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 0px;
+
+  border-bottom-color: crimson;
+  border-bottom-width: 5px;
+  border-bottom-style: solid;
+}
+
+.my-title {
+  display: inline-block;
+  vertical-align: middle;
+
+  margin: 8px;
+  padding: 0;
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+}
+
+li.icon {
+  flex-basis: 25%;
+}
+
+a {
+  display: block;
+  text-align: center;
+
+  text-decoration: none;
+  color: black;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+header a {
+  margin: 4px;
+  margin-bottom: 0;
+  padding: 8px 16px;
+  padding-bottom: 0;
+}
