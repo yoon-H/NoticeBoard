@@ -1,29 +1,29 @@
-import "../css/toolbar.css"
+import styles from "../css/toolbar.module.css";
 
 export default function Toolbar({ editor }) {
   if (!editor) return;
 
   return (
     <>
-      <div className="button-group">
+      <div className={styles["button-group"]}>
         <button
           onClick={() => editor.chain().focus().toggleBold().run()}
           disabled={!editor.can().chain().focus().toggleBold().run()}
-          className={editor.isActive("bold") ? "is-active" : ""}
+          className={editor.isActive("bold") ? styles["is-active"] : ""}
         >
           Bold
         </button>
         <button
           onClick={() => editor.chain().focus().toggleItalic().run()}
           disabled={!editor.can().chain().focus().toggleItalic().run()}
-          className={editor.isActive("italic") ? "is-active" : ""}
+          className={editor.isActive("italic") ? styles["is-active"] : ""}
         >
           Italic
         </button>
         <button
           onClick={() => editor.chain().focus().toggleStrike().run()}
           disabled={!editor.can().chain().focus().toggleStrike().run()}
-          className={editor.isActive("strike") ? "is-active" : ""}
+          className={editor.isActive("strike") ? styles["is-active"] : ""}
         >
           Strike
         </button>
@@ -32,7 +32,7 @@ export default function Toolbar({ editor }) {
             editor.chain().focus().toggleHeading({ level: 1 }).run()
           }
           className={
-            editor.isActive("heading", { level: 1 }) ? "is-active" : ""
+            editor.isActive("heading", { level: 1 }) ? styles["is-active"] : ""
           }
         >
           H1
@@ -42,7 +42,7 @@ export default function Toolbar({ editor }) {
             editor.chain().focus().toggleHeading({ level: 2 }).run()
           }
           className={
-            editor.isActive("heading", { level: 2 }) ? "is-active" : ""
+            editor.isActive("heading", { level: 2 }) ? styles["is-active"] : ""
           }
         >
           H2
@@ -52,7 +52,7 @@ export default function Toolbar({ editor }) {
             editor.chain().focus().toggleHeading({ level: 3 }).run()
           }
           className={
-            editor.isActive("heading", { level: 3 }) ? "is-active" : ""
+            editor.isActive("heading", { level: 3 }) ? styles["is-active"] : ""
           }
         >
           H3
@@ -62,7 +62,7 @@ export default function Toolbar({ editor }) {
             editor.chain().focus().toggleHeading({ level: 4 }).run()
           }
           className={
-            editor.isActive("heading", { level: 4 }) ? "is-active" : ""
+            editor.isActive("heading", { level: 4 }) ? styles["is-active"] : ""
           }
         >
           H4
@@ -72,7 +72,7 @@ export default function Toolbar({ editor }) {
             editor.chain().focus().toggleHeading({ level: 5 }).run()
           }
           className={
-            editor.isActive("heading", { level: 5 }) ? "is-active" : ""
+            editor.isActive("heading", { level: 5 }) ? styles["is-active"] : ""
           }
         >
           H5
@@ -82,7 +82,7 @@ export default function Toolbar({ editor }) {
             editor.chain().focus().toggleHeading({ level: 6 }).run()
           }
           className={
-            editor.isActive("heading", { level: 6 }) ? "is-active" : ""
+            editor.isActive("heading", { level: 6 }) ? styles["is-active"] : ""
           }
         >
           H6

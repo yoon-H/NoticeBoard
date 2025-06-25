@@ -2,7 +2,7 @@ import { Link, NavLink, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-import "../css/home.css";
+import styles from "../css/home.module.css";
 import PostList from "../components/PostList.jsx";
 import Page from "../components/Page.jsx";
 
@@ -37,17 +37,17 @@ export default function Home() {
 
   return (
     <>
-      <div className="board-container">
-        <div className="board-header">
-          <Link to="/post" className="write-btn">
+      <div className={styles["board-container"]}>
+        <div className={styles["board-header"]}>
+          <Link to="/post" className={styles["write-btn"]}>
             글쓰기
           </Link>
         </div>
-        <div className="post-list">
-          <div className="post">
-            <p className="number">번호</p>
-            <p className="title">제목</p>
-            <p className="author">저자</p>
+        <div className={styles["post-list"]}>
+          <div className={styles["post"]}>
+            <p className={styles["number"]}>번호</p>
+            <p className={styles["title"]}>제목</p>
+            <p className={styles["author"]}>저자</p>
           </div>
           <PostList list={groups[activePage - 1] || []} />
         </div>

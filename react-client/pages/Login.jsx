@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import "../css/login.css";
+import styles from "../css/login.module.css";
 import { useState } from "react";
 import { ID_REG, PW_REG } from "../utils/validation.js";
 import axios from "axios";
@@ -41,9 +41,9 @@ export default function Login({ setIsLoggedIn }) {
 
   return (
     <>
-      <div id="login-container">
-        <div id="login-header">
-          <div className="input-text">
+      <div className={styles["login-container"]}>
+        <div className={styles["login-header"]}>
+          <div className={styles["input-text"]}>
             <p>아이디 </p>
             <input
               type="text"
@@ -53,7 +53,7 @@ export default function Login({ setIsLoggedIn }) {
               onChange={onChange}
             />
           </div>
-          <div className="input-text">
+          <div className={styles["input-text"]}>
             <p>비밀번호 </p>
             <input
               type="password"
@@ -64,8 +64,8 @@ export default function Login({ setIsLoggedIn }) {
             />
           </div>
         </div>
-        <div id="submit">
-          <button type="submit" id="submit-btn" onClick={submitForm}>
+        <div className={styles["submit"]}>
+          <button type="submit" className={styles["submit-btn"]} onClick={submitForm}>
             제출
           </button>
         </div>

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "../css/signup.css";
+import styles from "../css/signup.module.css";
 import { useNavigate } from "react-router-dom";
 import { ID_REG, NAME_REG, PW_REG } from "../utils/validation.js";
 import axios from "axios";
@@ -48,9 +48,9 @@ export default function SignUp() {
 
   return (
     <>
-      <div id="signup-container">
-        <div id="signup-header">
-          <div className="input-text">
+      <div className={styles["signup-container"]}>
+        <div className={styles["signup-header"]}>
+          <div className={styles["input-text"]}>
             <p>아이디 </p>
             <input
               type="text"
@@ -60,7 +60,7 @@ export default function SignUp() {
               onChange={onChange}
             />
           </div>
-          <div className="input-text">
+          <div className={styles["input-text"]}>
             <p>닉네임 </p>
             <input
               type="text"
@@ -70,7 +70,7 @@ export default function SignUp() {
               onChange={onChange}
             />
           </div>
-          <div className="input-text">
+          <div className={styles["input-text"]}>
             <p>비밀번호 </p>
             <input
               type="password"
@@ -80,7 +80,7 @@ export default function SignUp() {
               onChange={onChange}
             />
           </div>
-          <div className="input-text">
+          <div className={styles["input-text"]}>
             <p>비밀번호 확인 </p>
             <input
               type="password"
@@ -91,8 +91,8 @@ export default function SignUp() {
             />
           </div>
         </div>
-        <div id="submit">
-          <button type="submit" id="submit-btn" onClick={submitForm}>
+        <div className={styles["submit"]}>
+          <button type="submit" className={styles["submit-btn"]} onClick={submitForm}>
             제출
           </button>
         </div>

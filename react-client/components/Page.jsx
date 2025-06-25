@@ -1,5 +1,7 @@
 import { useNavigate } from "react-router-dom";
 
+import styles from "../css/home.module.css";
+
 export default function Page({ totalPages, currentPage }) {
   const navigate = useNavigate();
 
@@ -40,7 +42,7 @@ export default function Page({ totalPages, currentPage }) {
       element = <span key={idx}>...</span>;
     } else {
       element = (
-        <div className="page" key={idx}>
+        <div className={styles["page"]} key={idx}>
           <button
             type="button"
             className="page-btn"
@@ -55,5 +57,5 @@ export default function Page({ totalPages, currentPage }) {
     return element;
   });
 
-  return <div className="pages">{pages}</div>;
+  return <div className={styles["pages"]}>{pages}</div>;
 }
