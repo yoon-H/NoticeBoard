@@ -21,7 +21,7 @@ export default function App() {
   }, []);
 
   return (
-    <BrowserRouter>
+    <>
       <Nav isLoggedIn={isLoggedIn} />
       <Routes>
         <Route exact path="/" element={<Home />} />
@@ -31,6 +31,6 @@ export default function App() {
         <Route path="/detail/:id" element={<Detail />} />
         <Route path="/post" element={<Post />} />
       </Routes>
-    </BrowserRouter>
+    </>
   );
 }
