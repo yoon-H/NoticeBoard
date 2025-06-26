@@ -125,36 +125,7 @@ h2 {
   font-size: 1rem;
 }
 
-/* Code and preformatted text styles */
-.tiptap code {
-  background-color: var(--purple-light);
-  border-radius: 0.4rem;
-  color: var(--black);
-  font-size: 0.85rem;
-  padding: 0.25em 0.3em;
-}
 
-.tiptap pre {
-  background: var(--black);
-  border-radius: 0.5rem;
-  color: var(--white);
-  font-family: "JetBrainsMono", monospace;
-  margin: 1.5rem 0;
-  padding: 0.75rem 1rem;
-
-  code {
-    background: none;
-    color: inherit;
-    font-size: 0.8rem;
-    padding: 0;
-  }
-}
-
-.tiptap blockquote {
-  border-left: 3px solid var(--gray-3);
-  margin: 1.5rem 0;
-  padding-left: 1rem;
-}
 
 .tiptap hr {
   border: none;
