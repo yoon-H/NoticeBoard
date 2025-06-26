@@ -1,12 +1,11 @@
 import axios from "axios";
-import { navigate } from "../navigate.js";
 import { BASE_URL, getNewAccessToken } from "./auth.js";
 
-const privateInstance = axios.create({
+const optionalInstance = axios.create({
   baseURL: BASE_URL,
 });
 
-privateInstance.interceptors.response.use(
+optionalInstance.interceptors.response.use(
   (res) => res,
   async (err) => {
     const originalRequest = err.config;
@@ -17,11 +16,9 @@ privateInstance.interceptors.response.use(
       try {
         await getNewAccessToken();
 
-        return privateInstance(originalRequest);
+        return optionalInstance(originalRequest);
       } catch (err) {
         console.log("토큰 재발급 실패");
-
-        navigate("/login");
       }
     }
 
@@ -29,4 +26,4 @@ privateInstance.interceptors.response.use(
   }
 );
 
-export default privateInstance;
+export default optionalInstance;
