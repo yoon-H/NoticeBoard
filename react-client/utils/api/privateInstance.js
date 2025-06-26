@@ -1,11 +1,11 @@
 import axios from "axios";
-import { navigate } from "./navigate.js";
+import { navigate } from "../navigate.js";
 
-const instance = axios.create({
+const privateInstance = axios.create({
   baseURL: "api",
 });
 
-instance.interceptors.response.use(
+privateInstance.interceptors.response.use(
   (res) => res,
   async (err) => {
     const originalRequest = err.config;
@@ -16,7 +16,7 @@ instance.interceptors.response.use(
       try {
         await getNewAccessToken();
 
-        return instance(originalRequest);
+        return privateInstance(originalRequest);
       } catch (err) {
         console.log("토큰 재발급 실패");
 
@@ -29,7 +29,7 @@ instance.interceptors.response.use(
 );
 
 async function getNewAccessToken() {
-  await instance.post("/auth/refresh");
+  await privateInstance.post("/auth/refresh");
 }
 
-export default instance;
+export default privateInstance;
