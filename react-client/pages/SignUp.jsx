@@ -2,7 +2,7 @@ import { useState } from "react";
 import styles from "../css/signup.module.css";
 import { useNavigate } from "react-router-dom";
 import { ID_REG, NAME_REG, PW_REG } from "../utils/validation.js";
-import api from "../utils/axios.instance.js";
+import publicApi from "../utils/api/publicInstance.js";
 
 const infos = {
   id: "",
@@ -37,7 +37,7 @@ export default function SignUp() {
       return alert("비밀번호와 일치하지 않습니다.");
 
     try {
-      const res = await api.post("/auth/signup", inputs);
+      const res = await publicApi.post("/auth/signup", inputs);
 
       if (res) navigate("/login");
     } catch (err) {

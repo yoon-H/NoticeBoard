@@ -1,6 +1,6 @@
-import api from '../utils/axios.instance.js'
+import api from "./api/privateInstance.js";
 
-export async function checkUser () {
-    const res = await api.get('/auth/profile');
-    return res.data;
+export async function checkUser() {
+  const res = await api.get("/auth/profile");
+  return res.data;
 }

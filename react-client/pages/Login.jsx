@@ -2,7 +2,8 @@ import { useNavigate } from "react-router-dom";
 import styles from "../css/login.module.css";
 import { useState } from "react";
 import { ID_REG, PW_REG } from "../utils/validation.js";
-import api from "../utils/axios.instance.js";
+import privateApi from "../utils/api/privateInstance.js";
+import publicApi from "../utils/api/publicInstance.js";
 
 const infos = {
   id: "",
@@ -29,7 +30,7 @@ export default function Login({ setIsLoggedIn }) {
       return alert("비밀번호를 다시 입력해주세요.");
 
     try {
-      const res = await api.post("/auth/login", inputs);
+      const res = await publicApi.post("/auth/login", inputs);
 
       setIsLoggedIn(true);
       navigate("/");

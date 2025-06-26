@@ -2,7 +2,7 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
 import { useNavigate, useParams } from "react-router-dom";
-import api from "../utils/axios.instance.js";
+import privateApi from "../utils/api/privateInstance.js";
 import { useState } from "react";
 import Focus from "@tiptap/extension-focus";
 
@@ -39,7 +39,7 @@ export default function Post() {
     useEffect(() => {
       const getPost = async () => {
         try {
-          const res = await api.get(`/posts/${postId}`);
+          const res = await privateApi.get(`/posts/${postId}`);
 
           const data = res.data;
 
@@ -71,9 +71,9 @@ export default function Post() {
       };
 
       if (isEditing) {
-        await api.put(data);
+        await privateApi.put(data);
       } else {
-        const res = await api.post(`/posts`, data);
+        const res = await privateApi.post(`/posts`, data);
 
         if (res.data.id) postId = res.data.id;
       }

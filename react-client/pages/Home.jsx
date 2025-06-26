@@ -1,6 +1,7 @@
 import { Link, NavLink, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import api from "../utils/axios.instance.js";
+import privateApi from "../utils/api/privateInstance.js";
+import publicApi from "../utils/api/publicInstance.js";
 
 import styles from "../css/home.module.css";
 import PostList from "../components/PostList.jsx";
@@ -21,7 +22,7 @@ export default function Home() {
   useEffect(() => {
     const getPosts = async () => {
       try {
-        const res = await api.get("/posts");
+        const res = await publicApi.get("/posts");
         setPostDatas(res.data.reverse());
       } catch (err) {
         console.log(err);
