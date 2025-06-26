@@ -5,6 +5,8 @@ import api from "../utils/axios.instance.js";
 import styles from "../css/home.module.css";
 import PostList from "../components/PostList.jsx";
 import Page from "../components/Page.jsx";
+import { checkUser } from "../utils/checkAuth.js";
+import { navigate } from "../utils/navigate.js";
 
 export default function Home() {
   const [postDatas, setPostDatas] = useState([]);
@@ -35,13 +37,21 @@ export default function Home() {
     groups.push(postDatas.slice(i, i + 10));
   }
 
+  const handleWriteBtn = async () => {
+    const data = await checkUser();
+
+    if (!data || !data.user || !data.user.id) return;
+
+    navigate("/post");
+  };
+
   return (
     <>
       <div className={styles["board-container"]}>
         <div className={styles["board-header"]}>
-          <Link to="/post" className={styles["write-btn"]}>
+          <button className={styles["write-btn"]} onClick={handleWriteBtn}>
             글쓰기
-          </Link>
+          </button>
         </div>
         <div className={styles["post-list"]}>
           <div className={styles["post"]}>
