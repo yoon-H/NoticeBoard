@@ -1,4 +1,5 @@
 import axios from "axios";
+import { navigate } from "./navigate.js";
 
 const instance = axios.create({
   baseURL: "api",
@@ -20,7 +21,7 @@ instance.interceptors.response.use(
       } catch (err) {
         console.log("토큰 재발급 실패");
 
-        
+        navigate("/login");
       }
     }
 
@@ -31,3 +32,5 @@ instance.interceptors.response.use(
 async function getNewAccessToken() {
   await instance.post("/auth/refresh");
 }
+
+export default instance;

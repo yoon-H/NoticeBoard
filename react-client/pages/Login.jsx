@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import styles from "../css/login.module.css";
 import { useState } from "react";
 import { ID_REG, PW_REG } from "../utils/validation.js";
-import axios from "axios";
+import api from "../utils/axios.instance.js";
 
 const infos = {
   id: "",
@@ -29,7 +29,7 @@ export default function Login({ setIsLoggedIn }) {
       return alert("비밀번호를 다시 입력해주세요.");
 
     try {
-      const res = await axios.post("/api/auth/login", inputs);
+      const res = await api.post("/auth/login", inputs);
 
       setIsLoggedIn(true);
       navigate("/");
@@ -65,7 +65,11 @@ export default function Login({ setIsLoggedIn }) {
           </div>
         </div>
         <div className={styles["submit"]}>
-          <button type="submit" className={styles["submit-btn"]} onClick={submitForm}>
+          <button
+            type="submit"
+            className={styles["submit-btn"]}
+            onClick={submitForm}
+          >
             제출
           </button>
         </div>
