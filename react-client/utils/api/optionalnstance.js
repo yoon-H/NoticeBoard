@@ -11,8 +11,8 @@ optionalInstance.interceptors.response.use(
     const originalRequest = err.config;
 
     //401 인증 에러
-    if (err.response?.status === 401 && !originalRequest.retry) {
-      originalRequest.retry = true;
+    if (err.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
       try {
         await getNewAccessToken();
 

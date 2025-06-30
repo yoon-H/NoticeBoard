@@ -9,13 +9,13 @@ const privateInstance = axios.create({
 privateInstance.interceptors.response.use(
   (res) => res,
   async (err) => {
-    const originalRequest = err.config;
+    const originalRequest = originalRequest || err.config;
 
     //401 인증 에러
-    if (err.response?.status === 401 && !originalRequest.retry) {
-      originalRequest.retry = true;
+    if (err.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
       try {
-        await getNewAccessToken();
+        await getNewAccessToken();ew
 
         return privateInstance(originalRequest);
       } catch (err) {
