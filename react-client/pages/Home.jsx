@@ -6,7 +6,7 @@ import publicApi from "../utils/api/publicInstance.js";
 import styles from "../css/home.module.css";
 import PostList from "../components/PostList.jsx";
 import Page from "../components/Page.jsx";
-import { checkUser } from "../utils/checkAuth.js";
+import { checkUser } from "../utils/checkUser.js";
 import { navigate } from "../utils/navigate.js";
 
 export default function Home() {
