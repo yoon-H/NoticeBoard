@@ -1,7 +1,9 @@
 import privateApi from "./privateInstance.js";
+import optionalApi from "./optionalnstance.js";
 
-export const BASE_URL = "api";
-
-export async function getNewAccessToken() {
-  await privateApi.post("/auth/refresh");
+export async function getNewAccessToken(isOptional = false) {
+  let api;
+  if (isOptional) api = optionalApi;
+  else api = privateApi;
+  await api.post("/auth/refresh");
 }

@@ -12,8 +12,6 @@ export function UserProvider({ children }) {
       try {
         const data = await checkUser(true);
 
-        console.log(data);
-
         if (!data || !data.user) throw new Error("유저 정보가 없습니다.");
 
         setUser(data.user);
@@ -21,8 +19,6 @@ export function UserProvider({ children }) {
         setUser(null);
       } finally {
         setIsChecked(true);
-
-        console.log("finally");
       }
     };
 
