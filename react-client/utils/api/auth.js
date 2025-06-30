@@ -1,5 +1,7 @@
+import privateApi from "./privateInstance.js";
+
 export const BASE_URL = "api";
 
 export async function getNewAccessToken() {
-  await privateInstance.post("/auth/refresh");
+  await privateApi.post("/auth/refresh");
 }
