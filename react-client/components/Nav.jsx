@@ -2,12 +2,15 @@ import { NavLink } from "react-router-dom";
 import { useState } from "react";
 
 import styles from "../css/nav.module.css";
+import { useUser } from "../hooks/useUser.js";
 
-function Status({ isLoggedIn }) {
+function Status() {
+  const { user } = useUser();
+
   let btn1;
   let btn2;
 
-  if (!isLoggedIn) {
+  if (!user) {
     btn1 = <NavLink to="/sign-up">회원가입</NavLink>;
     btn2 = <NavLink to="/login">로그인</NavLink>;
   } else {
@@ -23,14 +26,14 @@ function Status({ isLoggedIn }) {
   );
 }
 
-export default function Nav({ isLoggedIn }) {
+export default function Nav() {
   return (
     <div>
       <h1 className={styles["my-title"]}>
         <NavLink to="/">게시판</NavLink>
       </h1>
       <ul>
-        <Status isLoggedIn={isLoggedIn} />
+        <Status />
       </ul>
     </div>
   );

@@ -2,17 +2,19 @@ import { useNavigate } from "react-router-dom";
 import styles from "../css/login.module.css";
 import { useState } from "react";
 import { ID_REG, PW_REG } from "../utils/validation.js";
-import privateApi from "../utils/api/privateInstance.js";
 import publicApi from "../utils/api/publicInstance.js";
+import { useUser } from "../hooks/useUser.js";
+import { checkUser } from "../utils/checkUser.js";
 
 const infos = {
   id: "",
   password: "",
 };
 
-export default function Login({ setIsLoggedIn }) {
+export default function Login() {
   const [inputs, setInputs] = useState(infos);
   const navigate = useNavigate();
+  const { setUser } = useUser();
 
   const onChange = (e) => {
     const { name, value } = e.target;
@@ -32,7 +34,13 @@ export default function Login({ setIsLoggedIn }) {
     try {
       const res = await publicApi.post("/auth/login", inputs);
 
-      setIsLoggedIn(true);
+      if (!res) return;
+
+      const dbUser = await checkUser();
+
+      if (!dbUser) return;
+      setUser(dbUser);
+
       navigate("/");
     } catch (err) {
       console.log(err);
