@@ -23,6 +23,7 @@ privateInstance.interceptors.response.use(
         return privateInstance(originalRequest);
       } catch (err) {
         console.log("토큰 재발급 실패");
+        console.log(err);
 
         navigate("/login");
       } finally {
