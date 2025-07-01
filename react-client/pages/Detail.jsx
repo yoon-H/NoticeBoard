@@ -7,8 +7,9 @@ import Page from "../components/Page.jsx";
 import { useUser } from "../hooks/useUser.js";
 import { navigate } from "../utils/navigate.js";
 import { checkUser } from "../utils/checkUser.js";
-import { EditorContent, EditorContext, useEditor } from "@tiptap/react";
+import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import privateApi from "../utils/api/privateInstance.js";
 
 const infos = {
   title: "",
@@ -70,13 +71,6 @@ export default function Detail() {
     getPost();
   }, [editor]);
 
-  // useEffect(() => {
-  //   console.log(postInfo);
-
-  //   console.log("post");
-  //   editor?.commands.setContent(postInfo.content);
-  // }, [editor]);
-
   // 댓글 조회
   useEffect(() => {
     const getComments = async () => {
@@ -107,16 +101,29 @@ export default function Detail() {
 
     setUser(data.user);
 
-    console.log(data.user);
-    console.log(user);
-    console.log(postInfo);
-
     if (user.id !== postInfo.authorId) {
       alert("작성자가 아닙니다");
       return;
     }
 
     navigate(`/post/${postId}`);
+  };
+
+  const deletePost = async () => {
+    const data = await checkUser();
+
+    if (!data || !data.user || !data.user.id) return;
+
+    setUser(data.user);
+
+    if (user.id !== postInfo.authorId) {
+      alert("작성자가 아닙니다");
+      return;
+    }
+
+    const res = await privateApi.delete(`/posts/${postId}`);
+
+    if (res) navigate("/");
   };
 
   return (
@@ -136,7 +143,11 @@ export default function Detail() {
             >
               수정
             </button>
-            <button type="button" className={styles["delete-btn"]}>
+            <button
+              type="button"
+              className={styles["delete-btn"]}
+              onClick={deletePost}
+            >
               삭제
             </button>
           </div>
