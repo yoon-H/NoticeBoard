@@ -44,7 +44,7 @@ export default function Home() {
     const data = await checkUser();
 
     if (!data || !data.user || !data.user.id) return;
-    
+
     setUser(data.user);
 
     navigate("/post");
@@ -67,7 +67,7 @@ export default function Home() {
           <PostList list={groups[activePage - 1] || []} />
         </div>
       </div>
-      <Page totalPages={groups.length} currentPage={activePage} baseUrl={"/"} />
+      <Page totalPages={groups.length} currentPage={activePage} />
     </>
   );
 }

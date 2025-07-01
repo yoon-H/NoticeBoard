@@ -68,7 +68,14 @@ export default function Detail() {
     };
 
     getPost();
-  }, []);
+  }, [editor]);
+
+  // useEffect(() => {
+  //   console.log(postInfo);
+
+  //   console.log("post");
+  //   editor?.commands.setContent(postInfo.content);
+  // }, [editor]);
 
   // 댓글 조회
   useEffect(() => {
@@ -104,7 +111,10 @@ export default function Detail() {
     console.log(user);
     console.log(postInfo);
 
-    if (user.id !== postInfo.authorId) return;
+    if (user.id !== postInfo.authorId) {
+      alert("작성자가 아닙니다");
+      return;
+    }
 
     navigate(`/post/${postId}`);
   };
@@ -132,7 +142,7 @@ export default function Detail() {
           </div>
         </div>
         <div className={styles["post-files"]} />
-      <EditorContent className={styles["post-content"]} editor={editor} />
+        <EditorContent className={styles["post-content"]} editor={editor} />
         <div className={styles["input-comment"]}>
           <div className={styles["input-content"]}>
             <textarea
@@ -151,7 +161,6 @@ export default function Detail() {
           className={styles["comment-pages"]}
           totalPages={groups.length}
           currentPage={activePage}
-          baseUrl={"/detail"}
         />
       </div>
     </>

@@ -2,11 +2,11 @@ import { useNavigate } from "react-router-dom";
 
 import styles from "../css/home.module.css";
 
-export default function Page({ totalPages, currentPage, baseUrl }) {
+export default function Page({ totalPages, currentPage }) {
   const navigate = useNavigate();
 
   const goToPage = (page) => {
-    navigate(baseUrl + `?page=${page}`);
+    navigate(`?page=${page}`);
   };
 
   // 페이지 번호 모음
