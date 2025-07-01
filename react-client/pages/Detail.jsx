@@ -203,7 +203,10 @@ export default function Detail() {
             </button>
           </div>
         </div>
-        <Comments list={groups[activePage - 1] || []} />
+        <Comments
+          list={groups[activePage - 1] || []}
+          getComments={getComments}
+        />
         <Page
           className={styles["comment-pages"]}
           totalPages={groups.length}
@@ -214,14 +217,25 @@ export default function Detail() {
   );
 }
 
-function Comments({ list }) {
+function Comments({ list, getComments }) {
   const { user } = useUser();
+
+  // 삭제 버튼 이벤트
+  const deleteComment = async (id) => {
+    await publicApi.delete(`/comments/${id}`);
+
+    getComments();
+  };
+
   const comments = list.map((comment) => {
     const time = getEffectiveDate(comment.createTime, comment.updateTime);
 
     let isVisible = true;
 
     if (!user || user.id !== comment.authorId) isVisible = false;
+
+    console.log(comment.id);
+    console.log(isVisible);
     return (
       <div className={styles["comment"]} key={comment.id}>
         <div className={styles["comment-header"]}>
@@ -234,7 +248,11 @@ function Comments({ list }) {
               <button type="button" className={styles["comment-edit-btn"]}>
                 수정
               </button>
-              <button type="button" className={styles["comment-delete-btn"]}>
+              <button
+                type="button"
+                className={styles["comment-delete-btn"]}
+                onClick={() => deleteComment(comment.id)}
+              >
                 삭제
               </button>
             </div>
