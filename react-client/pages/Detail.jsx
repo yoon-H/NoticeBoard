@@ -7,6 +7,8 @@ import Page from "../components/Page.jsx";
 import { useUser } from "../hooks/useUser.js";
 import { navigate } from "../utils/navigate.js";
 import { checkUser } from "../utils/checkUser.js";
+import { EditorContent, EditorContext, useEditor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
 
 const infos = {
   title: "",
@@ -25,6 +27,11 @@ export default function Detail() {
   const [activePage, setActivePage] = useState(1);
   const [searchParams] = useSearchParams();
   const { user, setUser } = useUser();
+
+  const editor = useEditor({
+    extensions: [StarterKit],
+    editable: false,
+  });
 
   // 페이지 조회
   useEffect(() => {
@@ -45,6 +52,8 @@ export default function Detail() {
         if (!post) return;
 
         const { title, createTime, updateTime, author, content, userId } = post;
+
+        editor.commands.setContent(content);
 
         setPostInfo({
           title: title,
@@ -87,7 +96,7 @@ export default function Detail() {
   const editPost = async () => {
     const data = await checkUser();
 
-    if(!data || !data.user || !data.user.id) return;
+    if (!data || !data.user || !data.user.id) return;
 
     setUser(data.user);
 
@@ -123,7 +132,7 @@ export default function Detail() {
           </div>
         </div>
         <div className={styles["post-files"]} />
-        <div className={styles["post-content"]}>{postInfo.content}</div>
+      <EditorContent className={styles["post-content"]} editor={editor} />
         <div className={styles["input-comment"]}>
           <div className={styles["input-content"]}>
             <textarea
