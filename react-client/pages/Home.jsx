@@ -8,11 +8,13 @@ import PostList from "../components/PostList.jsx";
 import Page from "../components/Page.jsx";
 import { checkUser } from "../utils/checkUser.js";
 import { navigate } from "../utils/navigate.js";
+import { useUser } from "../hooks/useUser.js";
 
 export default function Home() {
   const [postDatas, setPostDatas] = useState([]);
   const [activePage, setActivePage] = useState(1);
   const [searchParams] = useSearchParams();
+  const {setUser} = useUser();
 
   useEffect(() => {
     const param = parseInt(searchParams.get("page") || "1", 10);
@@ -42,6 +44,8 @@ export default function Home() {
     const data = await checkUser();
 
     if (!data || !data.user || !data.user.id) return;
+    
+    setUser(data.user);
 
     navigate("/post");
   };
@@ -63,7 +67,7 @@ export default function Home() {
           <PostList list={groups[activePage - 1] || []} />
         </div>
       </div>
-      <Page totalPages={groups.length} currentPage={activePage} />
+      <Page totalPages={groups.length} currentPage={activePage} baseUrl={"/"} />
     </>
   );
 }

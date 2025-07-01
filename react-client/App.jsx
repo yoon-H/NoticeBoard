@@ -27,6 +27,7 @@ export default function App() {
           {/* <Route path="/mypage" element={<Mypage/>} /> TODO */}
           <Route path="/detail/:id" element={<Detail />} />
           <Route path="/post" element={<Post />} />
+          <Route path="/post/:id" element={<Post />} />
         </Routes>
       </UserProvider>
     </>
