@@ -150,6 +150,10 @@ export default function Detail() {
     getComments();
   };
 
+  let isVisible = true;
+
+  if (!user || user.id !== postInfo.authorId) isVisible = false;
+
   return (
     <>
       <div className={styles["post-container"]}>
@@ -159,22 +163,24 @@ export default function Detail() {
             <p className={styles["time"]}>{postInfo.postTime}</p>
             <p className={styles["author"]}>{postInfo.author}</p>
           </div>
-          <div className={styles["post-btns"]}>
-            <button
-              type="button"
-              className={styles["edit-btn"]}
-              onClick={editPost}
-            >
-              수정
-            </button>
-            <button
-              type="button"
-              className={styles["delete-btn"]}
-              onClick={deletePost}
-            >
-              삭제
-            </button>
-          </div>
+          {isVisible && (
+            <div className={styles["post-btns"]}>
+              <button
+                type="button"
+                className={styles["edit-btn"]}
+                onClick={editPost}
+              >
+                수정
+              </button>
+              <button
+                type="button"
+                className={styles["delete-btn"]}
+                onClick={deletePost}
+              >
+                삭제
+              </button>
+            </div>
+          )}
         </div>
         <div className={styles["post-files"]} />
         <EditorContent className={styles["post-content"]} editor={editor} />
@@ -209,9 +215,13 @@ export default function Detail() {
 }
 
 function Comments({ list }) {
+  const { user } = useUser();
   const comments = list.map((comment) => {
     const time = getEffectiveDate(comment.createTime, comment.updateTime);
 
+    let isVisible = true;
+
+    if (!user || user.id !== comment.authorId) isVisible = false;
     return (
       <div className={styles["comment"]} key={comment.id}>
         <div className={styles["comment-header"]}>
@@ -219,14 +229,16 @@ function Comments({ list }) {
             <p>{comment.author}</p>
             <p className={styles["time"]}>{time}</p>
           </div>
-          <div>
-            <button type="button" className={styles["comment-edit-btn"]}>
-              수정
-            </button>
-            <button type="button" className={styles["comment-delete-btn"]}>
-              삭제
-            </button>
-          </div>
+          {isVisible && (
+            <div>
+              <button type="button" className={styles["comment-edit-btn"]}>
+                수정
+              </button>
+              <button type="button" className={styles["comment-delete-btn"]}>
+                삭제
+              </button>
+            </div>
+          )}
         </div>
         <div className={styles["comment-content"]}>
           <p>{comment.content}</p>
