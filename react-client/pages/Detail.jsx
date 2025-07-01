@@ -24,10 +24,11 @@ export default function Detail() {
   const postId = params.id;
 
   const [postInfo, setPostInfo] = useState(infos);
-  const [comments, setComments] = useState([]);
+  const [groups, setGroups] = useState([]);
   const [activePage, setActivePage] = useState(1);
   const [searchParams] = useSearchParams();
   const { user, setUser } = useUser();
+  const [myComment, setMyComment] = useState();
 
   const editor = useEditor({
     extensions: [StarterKit],
@@ -72,27 +73,35 @@ export default function Detail() {
   }, [editor]);
 
   // 댓글 조회
-  useEffect(() => {
-    const getComments = async () => {
-      try {
-        const res = await publicApi.get(`/posts/${postId}/comments`);
+  const getComments = async () => {
+    try {
+      const res = await publicApi.get(`/posts/${postId}/comments`);
 
-        if (!res || !res.data) return;
+      if (!res || !res.data) return;
 
-        setComments(res.data);
-      } catch (err) {
-        console.log(err);
+      const comments = res.data.reverse();
+
+      const tmp = [];
+
+      for (let i = 0; i < comments.length; i += 10) {
+        tmp.push(comments.slice(i, i + 10));
       }
-    };
 
+      setGroups(tmp);
+
+      //console.log(groups);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
     getComments();
   }, []);
 
-  const groups = [];
-
-  for (let i = 0; i < comments.length; i += 10) {
-    groups.push(comments.slice(i, i + 10));
-  }
+  const onChange = (e) => {
+    setMyComment(e.target.value);
+  };
 
   const editPost = async () => {
     const data = await checkUser();
@@ -124,6 +133,21 @@ export default function Detail() {
     const res = await privateApi.delete(`/posts/${postId}`);
 
     if (res) navigate("/");
+  };
+
+  const submitComment = async () => {
+    const data = await checkUser();
+
+    if (!data || !data.user || !data.user.id) return;
+
+    setUser(data.user);
+
+    const sendData = { content: myComment };
+
+    await privateApi.post(`/posts/${postId}/comments`, sendData);
+
+    setMyComment("");
+    getComments();
   };
 
   return (
@@ -159,10 +183,16 @@ export default function Detail() {
             <textarea
               className={styles["content"]}
               placeholder="내용"
+              onChange={onChange}
+              value={myComment}
             ></textarea>
           </div>
           <div className={styles["submit"]}>
-            <button type="submit" className={styles["submit-btn"]}>
+            <button
+              type="submit"
+              className={styles["submit-btn"]}
+              onClick={submitComment}
+            >
               제출
             </button>
           </div>
