@@ -218,34 +218,68 @@ export default function Detail() {
 }
 
 function Comments({ list, getComments }) {
-  const { user } = useUser();
+  const comments = list.map((comment) => {
+    return (
+      <Comment comment={comment} getComments={getComments} key={comment.id} />
+    );
+  });
 
-  // 삭제 버튼 이벤트
-  const deleteComment = async (id) => {
-    await publicApi.delete(`/comments/${id}`);
+  return <div className={styles["comment-container"]}>{comments}</div>;
+}
+
+function Comment({ comment, getComments }) {
+  const { user } = useUser();
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedContent, setEditedContent] = useState(comment.content);
+
+  // 수정 버튼 이벤트
+  const editComment = async (id) => {
+    await privateApi.put(`/comments/${id}`, {
+      content: editedContent,
+    });
+
+    setIsEditing(false);
 
     getComments();
   };
 
-  const comments = list.map((comment) => {
-    const time = getEffectiveDate(comment.createTime, comment.updateTime);
+  // 삭제 버튼 이벤트
+  const deleteComment = async (id) => {
+    await privateApi.delete(`/comments/${id}`);
 
-    let isVisible = true;
+    getComments();
+  };
 
-    if (!user || user.id !== comment.authorId) isVisible = false;
+  const time = getEffectiveDate(comment.createTime, comment.updateTime);
 
-    console.log(comment.id);
-    console.log(isVisible);
-    return (
-      <div className={styles["comment"]} key={comment.id}>
-        <div className={styles["comment-header"]}>
-          <div className={styles["comment-info"]}>
-            <p>{comment.author}</p>
-            <p className={styles["time"]}>{time}</p>
+  let isVisible = true;
+
+  if (!user || user.id !== comment.authorId) isVisible = false;
+
+  return (
+    <div className={styles["comment"]} key={comment.id}>
+      <div className={styles["comment-header"]}>
+        <div className={styles["comment-info"]}>
+          <p>{comment.author}</p>
+          <p className={styles["time"]}>{time}</p>
+        </div>
+        {isEditing ? (
+          <div>
+            <button type="button" onClick={() => setIsEditing(false)}>
+              취소
+            </button>
+            <button type="button" onClick={() => editComment(comment.id)}>
+              저장
+            </button>
           </div>
-          {isVisible && (
+        ) : (
+          isVisible && (
             <div>
-              <button type="button" className={styles["comment-edit-btn"]}>
+              <button
+                type="button"
+                className={styles["comment-edit-btn"]}
+                onClick={() => setIsEditing(true)}
+              >
                 수정
               </button>
               <button
@@ -256,14 +290,20 @@ function Comments({ list, getComments }) {
                 삭제
               </button>
             </div>
-          )}
-        </div>
-        <div className={styles["comment-content"]}>
-          <p>{comment.content}</p>
-        </div>
+          )
+        )}
       </div>
-    );
-  });
-
-  return <div className={styles["comment-container"]}>{comments}</div>;
+      {isEditing ? (
+        <textarea
+          className={styles["edit-content"]}
+          value={editedContent}
+          onChange={(e) => setEditedContent(e.target.value)}
+        />
+      ) : (
+        <div className={styles["comment-content"]}>
+          <p className={styles["comment-content-line"]}>{comment.content}</p>
+        </div>
+      )}
+    </div>
+  );
 }
