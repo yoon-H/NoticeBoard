@@ -121,7 +121,7 @@ export default function Post() {
   const addImage = () => {
     const input = document.createElement("input");
     input.type = "file";
-    input.accept = "*/*";
+    input.accept = "image/*";
     input.click();
 
     input.onchange = async () => {
