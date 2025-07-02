@@ -136,24 +136,25 @@ export default function Post() {
 
       const formData = new FormData(); // 이미지 파일로 보내기 위해 서버에 보낼 객체 생성
       for (const file of files) {
-        formData.append("files", file);
+        formData.append("attachment", file);
       }
 
       try {
-        const res = 1; // await privateApi.post(`/upload/attachment`, formData);
+        const res = await privateApi.post(`/upload/attachment`, formData);
 
         if (!res || !res.data || !res.data.files) return;
 
         const uploadFiles = res.data.files;
 
         for (const file of uploadFiles) {
+
           const url = SERVER_URL + file.url;
 
           editor
             .chain()
             .focus()
             .insertContent(
-              `<a href="${url}" download="${file.originalname}">${file.originalname}</a>`
+              `<a href="${url}" download="${file.originalName}">${file.originalName}</a>`
             )
             .run();
         }
