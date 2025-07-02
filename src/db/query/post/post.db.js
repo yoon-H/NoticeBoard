@@ -47,7 +47,7 @@ export const createPost = async ({ title, author, content }, files) => {
         if (!list.includes(img.url)) {
           // 안 쓰이면
           // 로컬 파일 삭제
-          const filePath = path.join(__dirname, "../../../../public", img.url);
+          const filePath = path.join(__dirname, "../uploads", img.url);
           fs.unlink(filePath, (err) => {
             if (err) console.error(`${filePath} 삭제 실패했습니다. :`, err);
           });
@@ -70,7 +70,7 @@ export const createPost = async ({ title, author, content }, files) => {
         if (!files.includes(String(file.id))) {
           // 안 쓰이면
           // 로컬 파일 삭제
-          const filePath = path.join(__dirname, "../../../../public", file.url);
+          const filePath = path.join(__dirname, "../uploads", file.url);
           fs.unlink(filePath, (err) => {
             if (err) console.error(`${filePath} 삭제 실패했습니다. :`, err);
           });
@@ -105,7 +105,6 @@ export const createPost = async ({ title, author, content }, files) => {
 export const getPost = async (id) => {
   const [row] = await pool.query(SQL_POST_QUERIES.GET_POST, [id]);
 
-
   return row[0];
 };
 
@@ -138,7 +137,7 @@ export const editPost = async ({ title, content, id, author }, files) => {
         if (!list.includes(img.url)) {
           // 안 쓰이면
           // 로컬 파일 삭제
-          const filePath = path.join(__dirname, "../../../../public", img.url);
+          const filePath = path.join(__dirname, "../uploads", img.url);
           fs.unlink(filePath, (err) => {
             if (err) console.error(`${filePath} 삭제 실패했습니다. :`, err);
           });
@@ -158,7 +157,7 @@ export const editPost = async ({ title, content, id, author }, files) => {
         if (!list.includes(img.url)) {
           // 안 쓰이면
           // 로컬 파일 삭제
-          const filePath = path.join(__dirname, "../../../../public", img.url);
+          const filePath = path.join(__dirname, "../uploads", img.url);
           fs.unlink(filePath, (err) => {
             if (err) console.error(`${filePath} 삭제 실패했습니다. :`, err);
           });
@@ -183,7 +182,7 @@ export const editPost = async ({ title, content, id, author }, files) => {
         if (!files.includes(String(file.id))) {
           // 안 쓰이면
           // 로컬 파일 삭제
-          const filePath = path.join(__dirname, "../../../../public", file.url);
+          const filePath = path.join(__dirname, "../uploads", file.url);
           fs.unlink(filePath, (err) => {
             if (err) console.error(`${filePath} 삭제 실패했습니다. :`, err);
           });
@@ -206,7 +205,7 @@ export const editPost = async ({ title, content, id, author }, files) => {
         if (!files.includes(String(file.id))) {
           // 안 쓰이면
           // 로컬 파일 삭제
-          const filePath = path.join(__dirname, "../../../../public", file.url);
+          const filePath = path.join(__dirname, "../uploads", file.url);
           fs.unlink(filePath, (err) => {
             if (err) console.error(`${filePath} 삭제 실패했습니다. :`, err);
           });

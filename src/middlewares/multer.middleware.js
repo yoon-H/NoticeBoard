@@ -18,7 +18,7 @@ const imageStorage = multer.diskStorage({
 
     const uploadPath = path.join(
       __dirname,
-      `../../public/uploads/images/${req.user.id}/${year}/${month}/${day}`
+      `../uploads/images/${req.user.id}/${year}/${month}/${day}`
     );
 
     fs.mkdirSync(uploadPath, { recursive: true });
@@ -44,7 +44,7 @@ const attachmentStorage = multer.diskStorage({
 
     const uploadPath = path.join(
       __dirname,
-      `../../public/uploads/attachments/${req.user.id}/${year}/${month}/${day}`
+      `../uploads/attachments/${req.user.id}/${year}/${month}/${day}`
     );
 
     fs.mkdirSync(uploadPath, { recursive: true });
