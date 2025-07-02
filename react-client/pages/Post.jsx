@@ -95,13 +95,10 @@ export default function Post() {
 
   // 이미지 추가
   const addImage = () => {
-    console.log("addImage");
     const input = document.createElement("input");
     input.setAttribute("type", "file"); // 파일 선택창으로 변경
     input.setAttribute("accept", "image/*"); // 이미지 파일 제한
     input.click();
-
-    console.log("data");
 
     input.onchange = async () => {
       // 파일을 선택했을 때
