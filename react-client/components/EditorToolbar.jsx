@@ -1,9 +1,7 @@
 import styles from "../css/toolbar.module.css";
 
-export default function Toolbar({ editor, addImage }) {
+export default function Toolbar({ editor, addImage, addFile }) {
   if (!editor) return;
-
-
 
   return (
     <>
@@ -102,6 +100,7 @@ export default function Toolbar({ editor, addImage }) {
           Redo
         </button>
         <button onClick={addImage}>Image</button>
+        <button onClick={addFile}>File</button>
       </div>
     </>
   );

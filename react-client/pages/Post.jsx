@@ -96,13 +96,14 @@ export default function Post() {
   // 이미지 추가
   const addImage = () => {
     const input = document.createElement("input");
-    input.setAttribute("type", "file"); // 파일 선택창으로 변경
-    input.setAttribute("accept", "image/*"); // 이미지 파일 제한
+    input.type = "file";
+    input.accept = "*/*";
     input.click();
 
     input.onchange = async () => {
       // 파일을 선택했을 때
       const file = input.files[0];
+      if (!file) return;
       const formData = new FormData(); // 이미지 파일로 보내기 위해 서버에 보낼 객체 생성
       formData.append("image", file); // 파일 담기
 
@@ -114,6 +115,48 @@ export default function Post() {
         const url = SERVER_URL + res.data.imageUrl;
 
         editor.chain().focus().setImage({ src: url }).run();
+      } catch (err) {
+        console.log(err);
+      }
+    };
+  };
+
+  // 파일 추가
+  const addFile = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.multiple = true;
+    input.accept = "*/*";
+    input.click();
+
+    input.onchange = async () => {
+      // 파일을 선택했을 때
+      const files = input.files;
+      if (!files || files.length === 0) return;
+
+      const formData = new FormData(); // 이미지 파일로 보내기 위해 서버에 보낼 객체 생성
+      for (const file of files) {
+        formData.append("files", file);
+      }
+
+      try {
+        const res = 1; // await privateApi.post(`/upload/attachment`, formData);
+
+        if (!res || !res.data || !res.data.files) return;
+
+        const uploadFiles = res.data.files;
+
+        for (const file of uploadFiles) {
+          const url = SERVER_URL + file.url;
+
+          editor
+            .chain()
+            .focus()
+            .insertContent(
+              `<a href="${url}" download="${file.originalname}">${file.originalname}</a>`
+            )
+            .run();
+        }
       } catch (err) {
         console.log(err);
       }
@@ -136,7 +179,11 @@ export default function Post() {
         <div className={styles["post-files"]}>
           <input type="file" className={styles["attachment-header"]} multiple />
         </div>
-        <EditorToolbar editor={editor} addImage={addImage}></EditorToolbar>
+        <EditorToolbar
+          editor={editor}
+          addImage={addImage}
+          addFile={addFile}
+        ></EditorToolbar>
         <EditorContent
           className={styles["tiptap"]}
           editor={editor}
