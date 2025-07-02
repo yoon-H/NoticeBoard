@@ -1,14 +1,34 @@
-import { EditorContent, useEditor } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import Image from "@tiptap/extension-image";
 import { useNavigate, useParams } from "react-router-dom";
 import privateApi from "../utils/api/privateInstance.js";
 import { useEffect, useState } from "react";
-import Focus from "@tiptap/extension-focus";
 
 import EditorToolbar from "../components/EditorToolbar.jsx";
 import styles from "../css/post.module.css";
 import { SERVER_URL } from "../utils/api/constants.js";
+
+import { EditorContent, useEditor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Image from "@tiptap/extension-image";
+import Focus from "@tiptap/extension-focus";
+import Link from "@tiptap/extension-link";
+
+const CustomLink = Link.extend({
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      download: {
+        default: null,
+        parseHTML: (element) => element.getAttribute("download"),
+        renderHTML: (attributes) => {
+          if (!attributes.download) return {};
+          return {
+            download: attributes.download,
+          };
+        },
+      },
+    };
+  },
+});
 
 export default function Post() {
   const navigate = useNavigate();
@@ -29,6 +49,10 @@ export default function Post() {
       Focus.configure({
         className: "has-focus",
         mode: "shallowest",
+      }),
+      CustomLink.configure({
+        autolink: false,
+        linkOnPaste: false,
       }),
     ],
   });
@@ -147,16 +171,27 @@ export default function Post() {
         const uploadFiles = res.data.files;
 
         for (const file of uploadFiles) {
-
           const url = SERVER_URL + file.url;
 
-          editor
-            .chain()
-            .focus()
-            .insertContent(
-              `<a href="${url}" download="${file.originalName}">${file.originalName}</a>`
-            )
-            .run();
+          editor.commands.insertContent({
+            type: "paragraph",
+            content: [
+              {
+                type: "text",
+                text: `${file.originalName}`,
+                marks: [
+                  {
+                    type: "link",
+                    attrs: {
+                      href: `${url}`,
+                      target: "_blank",
+                      download: `${file.originalName}`,
+                    },
+                  },
+                ],
+              },
+            ],
+          });
         }
       } catch (err) {
         console.log(err);
