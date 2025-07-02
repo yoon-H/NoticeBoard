@@ -8,6 +8,7 @@ import Focus from "@tiptap/extension-focus";
 
 import EditorToolbar from "../components/EditorToolbar.jsx";
 import styles from "../css/post.module.css";
+import { SERVER_URL } from "../utils/api/constants.js";
 
 export default function Post() {
   const navigate = useNavigate();
@@ -21,7 +22,10 @@ export default function Post() {
   const editor = useEditor({
     extensions: [
       StarterKit,
-      Image,
+      Image.configure({
+        inline: true,
+        allowBase64: true,
+      }),
       Focus.configure({
         className: "has-focus",
         mode: "shallowest",
@@ -89,6 +93,36 @@ export default function Post() {
     }
   };
 
+  // 이미지 추가
+  const addImage = () => {
+    console.log("addImage");
+    const input = document.createElement("input");
+    input.setAttribute("type", "file"); // 파일 선택창으로 변경
+    input.setAttribute("accept", "image/*"); // 이미지 파일 제한
+    input.click();
+
+    console.log("data");
+
+    input.onchange = async () => {
+      // 파일을 선택했을 때
+      const file = input.files[0];
+      const formData = new FormData(); // 이미지 파일로 보내기 위해 서버에 보낼 객체 생성
+      formData.append("image", file); // 파일 담기
+
+      try {
+        const res = await privateApi.post(`/upload/image`, formData);
+
+        if (!res || !res.data || !res.data.imageUrl) return;
+
+        const url = SERVER_URL + res.data.imageUrl;
+
+        editor.chain().focus().setImage({ src: url }).run();
+      } catch (err) {
+        console.log(err);
+      }
+    };
+  };
+
   return (
     <>
       <div className={styles["post-container"]}>
@@ -105,7 +139,7 @@ export default function Post() {
         <div className={styles["post-files"]}>
           <input type="file" className={styles["attachment-header"]} multiple />
         </div>
-        <EditorToolbar editor={editor}></EditorToolbar>
+        <EditorToolbar editor={editor} addImage={addImage}></EditorToolbar>
         <EditorContent
           className={styles["tiptap"]}
           editor={editor}

@@ -10,6 +10,7 @@ import { checkUser } from "../utils/checkUser.js";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import privateApi from "../utils/api/privateInstance.js";
+import Image from "@tiptap/extension-image";
 
 const infos = {
   title: "",
@@ -31,7 +32,7 @@ export default function Detail() {
   const [myComment, setMyComment] = useState();
 
   const editor = useEditor({
-    extensions: [StarterKit],
+    extensions: [StarterKit, Image],
     editable: false,
   });
 
