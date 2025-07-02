@@ -10,25 +10,9 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
 import Focus from "@tiptap/extension-focus";
-import Link from "@tiptap/extension-link";
+import { CustomLink } from "../utils/customLink.js";
 
-const CustomLink = Link.extend({
-  addAttributes() {
-    return {
-      ...this.parent?.(),
-      download: {
-        default: null,
-        parseHTML: (element) => element.getAttribute("download"),
-        renderHTML: (attributes) => {
-          if (!attributes.download) return {};
-          return {
-            download: attributes.download,
-          };
-        },
-      },
-    };
-  },
-});
+
 
 export default function Post() {
   const navigate = useNavigate();
@@ -184,7 +168,7 @@ export default function Post() {
                     type: "link",
                     attrs: {
                       href: `${url}`,
-                      target: "_blank",
+                      target: "",
                       download: `${file.originalName}`,
                     },
                   },

@@ -11,6 +11,7 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import privateApi from "../utils/api/privateInstance.js";
 import Image from "@tiptap/extension-image";
+import { CustomLink } from "../utils/customLink.js";
 
 const infos = {
   title: "",
@@ -32,7 +33,7 @@ export default function Detail() {
   const [myComment, setMyComment] = useState();
 
   const editor = useEditor({
-    extensions: [StarterKit, Image],
+    extensions: [StarterKit, Image, CustomLink],
     editable: false,
   });
 
