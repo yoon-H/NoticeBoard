@@ -8,7 +8,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
-import { getImageList } from "../../../utils/getImageList.js";
+import { extractContentData } from "../../../utils/htmlParser.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -19,7 +19,7 @@ export const getAllPosts = async () => {
   return rows;
 };
 
-export const createPost = async ({ title, author, content }, files) => {
+export const createPost = async ({ title, author, content }) => {
   const tran = await pool.getConnection();
   await tran.beginTransaction();
 
@@ -35,7 +35,7 @@ export const createPost = async ({ title, author, content }, files) => {
       ]);
       const postId = postResult.insertId;
 
-      const list = getImageList(content);
+      const { imageList, fileList } = extractContentData(content);
 
       // 임시 이미지 불러오기
       const [tempImages] = await tran.query(SQL_IMAGE_QUERIES.GET_TEMP_IMAGES, [
@@ -44,7 +44,7 @@ export const createPost = async ({ title, author, content }, files) => {
 
       // 이미지 확인
       for (const img of tempImages) {
-        if (!list.includes(img.url)) {
+        if (!imageList.includes(img.url)) {
           // 안 쓰이면
           // 로컬 파일 삭제
           const filePath = path.join(__dirname, "../uploads", img.url);
@@ -66,11 +66,13 @@ export const createPost = async ({ title, author, content }, files) => {
         [author]
       );
 
+      const fileNames = fileList.map((e) => e.name);
+
       for (const file of tempFiles) {
-        if (!files.includes(String(file.id))) {
+        if (!fileNames.includes(String(file.originalName))) {
           // 안 쓰이면
           // 로컬 파일 삭제
-          const filePath = path.join(__dirname, "../uploads", file.url);
+          const filePath = path.join(__dirname, file.url);
           fs.unlink(filePath, (err) => {
             if (err) console.error(`${filePath} 삭제 실패했습니다. :`, err);
           });
@@ -91,6 +93,7 @@ export const createPost = async ({ title, author, content }, files) => {
       await tran.commit();
 
       result.insertId = postId;
+      result.files = fileList;
     } catch (err) {
       console.error(`Transaction error : ${err.message}`);
       await tran.rollback();
@@ -124,7 +127,7 @@ export const editPost = async ({ title, content, id, author }, files) => {
         author,
       ]);
 
-      const list = getImageList(content);
+      const list = extractContentData(content);
 
       // 기존 이미지 가져오기
       const [prevImages] = await tran.query(

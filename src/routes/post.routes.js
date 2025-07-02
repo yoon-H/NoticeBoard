@@ -96,7 +96,7 @@ router.get("/posts", async (req, res, next) => {
  */
 router.post("/posts", authMiddleware, async (req, res, next) => {
   try {
-    const { title, content, files } = req.body;
+    const { title, content } = req.body;
     const author = req.user.id;
 
     if (!title || !author || !content)
@@ -105,12 +105,16 @@ router.post("/posts", authMiddleware, async (req, res, next) => {
     const obj = { title, author, content: sanitizePost(content) };
 
     // 트랜잭션
-    const result = await createPost(obj, files);
+    const result = await createPost(obj);
 
     if (result.insertId)
       return res
         .status(201)
-        .json({ id: result.insertId, message: "게시글이 저장되었습니다." });
+        .json({
+          id: result.insertId,
+          files: result.files,
+          message: "게시글이 저장되었습니다.",
+        });
     else
       return res.status(500).json({ message: "게시글 작성에 실패했습니다." });
   } catch (err) {
