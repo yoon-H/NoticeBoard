@@ -12,8 +12,6 @@ import Image from "@tiptap/extension-image";
 import Focus from "@tiptap/extension-focus";
 import { CustomLink } from "../utils/customLink.js";
 
-
-
 export default function Post() {
   const navigate = useNavigate();
   const params = useParams();
@@ -155,7 +153,7 @@ export default function Post() {
         const uploadFiles = res.data.files;
 
         for (const file of uploadFiles) {
-          const url = SERVER_URL + file.url;
+          const url = SERVER_URL + `/api/download/${file.id}`;
 
           editor.commands.insertContent({
             type: "paragraph",

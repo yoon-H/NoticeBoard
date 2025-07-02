@@ -24,7 +24,6 @@ export default function App() {
           <Route exact path="/" element={<Home />} />
           <Route path="/sign-up" element={<SignUp />} />
           <Route path="/login" element={<Login />} />
-          {/* <Route path="/mypage" element={<Mypage/>} /> TODO */}
           <Route path="/detail/:id" element={<Detail />} />
           <Route path="/post" element={<Post />} />
           <Route path="/post/:id" element={<Post />} />

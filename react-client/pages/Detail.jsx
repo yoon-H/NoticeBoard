@@ -12,6 +12,7 @@ import StarterKit from "@tiptap/starter-kit";
 import privateApi from "../utils/api/privateInstance.js";
 import Image from "@tiptap/extension-image";
 import { CustomLink } from "../utils/customLink.js";
+import { SERVER_URL } from "../utils/api/constants.js";
 
 const infos = {
   title: "",
@@ -19,6 +20,7 @@ const infos = {
   author: "",
   authorId: "",
   content: "",
+  files: [],
 };
 
 export default function Detail() {
@@ -52,6 +54,17 @@ export default function Detail() {
         if (!res || !res.data) return;
 
         const post = res.data.post;
+        const files = res.data.files;
+
+        const fileLinks = files.map((file) => {
+          const url = SERVER_URL + `/api/download/${file.id}`;
+
+          return (
+            <div key={file.id}>
+              <a href={url}>{file.originalName}</a>
+            </div>
+          );
+        });
 
         if (!post) return;
 
@@ -65,6 +78,7 @@ export default function Detail() {
           author: author,
           authorId: userId,
           content: content,
+          files: fileLinks,
         });
       } catch (err) {
         console.log(err);
@@ -90,8 +104,6 @@ export default function Detail() {
       }
 
       setGroups(tmp);
-
-      //console.log(groups);
     } catch (err) {
       console.log(err);
     }
@@ -184,7 +196,7 @@ export default function Detail() {
             </div>
           )}
         </div>
-        <div className={styles["post-files"]} />
+        <div className={styles["post-files"]}>{postInfo.files}</div>
         <EditorContent className={styles["post-content"]} editor={editor} />
         <div className={styles["input-comment"]}>
           <div className={styles["input-content"]}>

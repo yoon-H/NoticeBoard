@@ -119,12 +119,12 @@ router.delete(
   }
 );
 
-router.get("/upload/:fileId", async (req, res, next) => {
+router.get("/download/:fileId", async (req, res, next) => {
   const fileId = req.params.fileId;
 
-  const file = getAttachmentById(fileId);
+  const file = await getAttachmentById(fileId);
 
-  const filePath = path.join(__dirname, file.storedName);
+  const filePath = path.join(__dirname, "../", file.url);
 
   if (!fs.existsSync(filePath)) {
     return res.status(404).send("파일이 존재하지 않습니다.");
