@@ -8,7 +8,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
-import { getImageList } from "../../../utils/getImageList.js";
+import { extractContentData } from "../../../utils/htmlParser.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -19,7 +19,7 @@ export const getAllPosts = async () => {
   return rows;
 };
 
-export const createPost = async ({ title, author, content }, files) => {
+export const createPost = async ({ title, author, content }) => {
   const tran = await pool.getConnection();
   await tran.beginTransaction();
 
@@ -35,7 +35,7 @@ export const createPost = async ({ title, author, content }, files) => {
       ]);
       const postId = postResult.insertId;
 
-      const list = getImageList(content);
+      const { imageList, fileList } = extractContentData(content);
 
       // 임시 이미지 불러오기
       const [tempImages] = await tran.query(SQL_IMAGE_QUERIES.GET_TEMP_IMAGES, [
@@ -44,10 +44,10 @@ export const createPost = async ({ title, author, content }, files) => {
 
       // 이미지 확인
       for (const img of tempImages) {
-        if (!list.includes(img.url)) {
+        if (!imageList.includes(img.url)) {
           // 안 쓰이면
           // 로컬 파일 삭제
-          const filePath = path.join(__dirname, "../../../../public", img.url);
+          const filePath = path.join(__dirname, "../../../", img.url);
           fs.unlink(filePath, (err) => {
             if (err) console.error(`${filePath} 삭제 실패했습니다. :`, err);
           });
@@ -66,11 +66,13 @@ export const createPost = async ({ title, author, content }, files) => {
         [author]
       );
 
+      const fileIds = fileList.map((e) => e.id);
+
       for (const file of tempFiles) {
-        if (!files.includes(String(file.id))) {
+        if (!fileIds.includes(file.id)) {
           // 안 쓰이면
           // 로컬 파일 삭제
-          const filePath = path.join(__dirname, "../../../../public", file.url);
+          const filePath = path.join(__dirname, "../../../", file.url);
           fs.unlink(filePath, (err) => {
             if (err) console.error(`${filePath} 삭제 실패했습니다. :`, err);
           });
@@ -91,6 +93,7 @@ export const createPost = async ({ title, author, content }, files) => {
       await tran.commit();
 
       result.insertId = postId;
+      result.files = fileList;
     } catch (err) {
       console.error(`Transaction error : ${err.message}`);
       await tran.rollback();
@@ -105,11 +108,10 @@ export const createPost = async ({ title, author, content }, files) => {
 export const getPost = async (id) => {
   const [row] = await pool.query(SQL_POST_QUERIES.GET_POST, [id]);
 
-
   return row[0];
 };
 
-export const editPost = async ({ title, content, id, author }, files) => {
+export const editPost = async ({ title, content, id, author }) => {
   const tran = await pool.getConnection();
   await tran.beginTransaction();
 
@@ -125,7 +127,7 @@ export const editPost = async ({ title, content, id, author }, files) => {
         author,
       ]);
 
-      const list = getImageList(content);
+      const { imageList, fileList } = extractContentData(content);
 
       // 기존 이미지 가져오기
       const [prevImages] = await tran.query(
@@ -135,10 +137,10 @@ export const editPost = async ({ title, content, id, author }, files) => {
 
       // 삭제된 이미지 처리
       for (const img of prevImages) {
-        if (!list.includes(img.url)) {
+        if (!imageList.includes(img.url)) {
           // 안 쓰이면
           // 로컬 파일 삭제
-          const filePath = path.join(__dirname, "../../../../public", img.url);
+          const filePath = path.join(__dirname, "../../../", img.url);
           fs.unlink(filePath, (err) => {
             if (err) console.error(`${filePath} 삭제 실패했습니다. :`, err);
           });
@@ -155,10 +157,10 @@ export const editPost = async ({ title, content, id, author }, files) => {
 
       // 이미지 확인
       for (const img of tempImages) {
-        if (!list.includes(img.url)) {
+        if (!imageList.includes(img.url)) {
           // 안 쓰이면
           // 로컬 파일 삭제
-          const filePath = path.join(__dirname, "../../../../public", img.url);
+          const filePath = path.join(__dirname, "../../../", img.url);
           fs.unlink(filePath, (err) => {
             if (err) console.error(`${filePath} 삭제 실패했습니다. :`, err);
           });
@@ -178,12 +180,14 @@ export const editPost = async ({ title, content, id, author }, files) => {
         [id]
       );
 
+      const fileIds = fileList.map((e) => e.id);
+
       // 삭제된 파일 처리
       for (const file of prevFiles) {
-        if (!files.includes(String(file.id))) {
+        if (!fileIds.includes(file.id)) {
           // 안 쓰이면
           // 로컬 파일 삭제
-          const filePath = path.join(__dirname, "../../../../public", file.url);
+          const filePath = path.join(__dirname, "../../../", file.url);
           fs.unlink(filePath, (err) => {
             if (err) console.error(`${filePath} 삭제 실패했습니다. :`, err);
           });
@@ -203,10 +207,10 @@ export const editPost = async ({ title, content, id, author }, files) => {
 
       // 파일 추가
       for (const file of tempFiles) {
-        if (!files.includes(String(file.id))) {
+        if (!fileIds.includes(file.id)) {
           // 안 쓰이면
           // 로컬 파일 삭제
-          const filePath = path.join(__dirname, "../../../../public", file.url);
+          const filePath = path.join(__dirname, "../../../", file.url);
           fs.unlink(filePath, (err) => {
             if (err) console.error(`${filePath} 삭제 실패했습니다. :`, err);
           });
@@ -226,7 +230,8 @@ export const editPost = async ({ title, content, id, author }, files) => {
 
       await tran.commit();
 
-      result = true;
+      result.flag = true;
+      result.files = fileList;
     } catch (err) {
       console.error(`Transaction error : ${err.message}`);
       await tran.rollback();

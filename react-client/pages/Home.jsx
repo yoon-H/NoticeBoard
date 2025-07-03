@@ -8,12 +8,14 @@ import PostList from "../components/PostList.jsx";
 import Page from "../components/Page.jsx";
 import { checkUser } from "../utils/checkUser.js";
 import { useNavigation } from "../utils/navigate.js";
+import { useUser } from "../hooks/useUser.js";
 
 export default function Home() {
   const { goToPost, goToLogin } = useNavigation();
   const [postDatas, setPostDatas] = useState([]);
   const [activePage, setActivePage] = useState(1);
   const [searchParams] = useSearchParams();
+  const { setUser } = useUser();
 
   useEffect(() => {
     const param = parseInt(searchParams.get("page") || "1", 10);
@@ -44,6 +46,8 @@ export default function Home() {
       const data = await checkUser();
 
       if (!data || !data.user || !data.user.id) return;
+
+      setUser(data.user);
 
       goToPost();
     } catch (err) {

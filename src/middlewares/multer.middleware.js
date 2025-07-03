@@ -1,4 +1,5 @@
 import multer from "multer";
+import { Buffer } from "buffer";
 import { v4 as uuidv4 } from "uuid";
 
 import fs from "fs";
@@ -18,7 +19,7 @@ const imageStorage = multer.diskStorage({
 
     const uploadPath = path.join(
       __dirname,
-      `../../public/uploads/images/${req.user.id}/${year}/${month}/${day}`
+      `../uploads/images/${req.user.id}/${year}/${month}/${day}`
     );
 
     fs.mkdirSync(uploadPath, { recursive: true });
@@ -44,7 +45,7 @@ const attachmentStorage = multer.diskStorage({
 
     const uploadPath = path.join(
       __dirname,
-      `../../public/uploads/attachments/${req.user.id}/${year}/${month}/${day}`
+      `../uploads/attachments/${req.user.id}/${year}/${month}/${day}`
     );
 
     fs.mkdirSync(uploadPath, { recursive: true });
@@ -52,6 +53,11 @@ const attachmentStorage = multer.diskStorage({
     done(null, uploadPath);
   },
   filename: function (req, file, done) {
+
+    const utf8Name = Buffer.from(file.originalname, "latin1").toString("utf-8");
+
+    file.originalname = utf8Name;
+
     const ext = path.extname(file.originalname);
     const name = uuidv4() + ext;
 

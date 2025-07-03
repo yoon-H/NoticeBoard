@@ -96,7 +96,7 @@ router.get("/posts", async (req, res, next) => {
  */
 router.post("/posts", authMiddleware, async (req, res, next) => {
   try {
-    const { title, content, files } = req.body;
+    const { title, content } = req.body;
     const author = req.user.id;
 
     if (!title || !author || !content)
@@ -105,12 +105,14 @@ router.post("/posts", authMiddleware, async (req, res, next) => {
     const obj = { title, author, content: sanitizePost(content) };
 
     // 트랜잭션
-    const result = await createPost(obj, files);
+    const result = await createPost(obj);
 
     if (result.insertId)
-      return res
-        .status(201)
-        .json({ id: result.insertId, message: "게시글이 저장되었습니다." });
+      return res.status(201).json({
+        id: result.insertId,
+        files: result.files,
+        message: "게시글이 저장되었습니다.",
+      });
     else
       return res.status(500).json({ message: "게시글 작성에 실패했습니다." });
   } catch (err) {
@@ -232,7 +234,7 @@ router.get("/posts/:postId", async (req, res, next) => {
 router.put("/posts/:postId", authMiddleware, async (req, res, next) => {
   try {
     const postId = req.params.postId;
-    const { title, content, files } = req.body;
+    const { title, content } = req.body;
     const author = req.user.id;
 
     if (isNaN(postId))
@@ -265,9 +267,11 @@ router.put("/posts/:postId", authMiddleware, async (req, res, next) => {
       author,
     };
 
-    await editPost(obj, files);
+    const result = await editPost(obj);
 
-    return res.status(200).json({ message: "게시글이 수정되었습니다." });
+    return res
+      .status(200)
+      .json({ files: result.files, message: "게시글이 수정되었습니다." });
   } catch (err) {
     next(err);
   }

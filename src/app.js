@@ -29,6 +29,8 @@ app.use("/api", [authRoutes, postRoutes, commentRoutes, uploadRoutes]);
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
 app.use(errorHandlerMiddleware);
 
 app.listen(PORT, HOST, () => {
