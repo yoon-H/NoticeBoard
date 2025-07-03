@@ -12,7 +12,7 @@ const SQL_ATTACHMENT_QUERIES = {
   DELETE_TEMP_ATTACHMENT:
     "DELETE FROM attachments WHERE id = ? AND is_temp = TRUE",
   SOFT_DELETE_ATTACHMENT:
-    "UPDATE attachments SET is_deleted = TRUE, delete_dt = CURRENT_TIMESTAMP WHERE post_id = ?",
+    "UPDATE attachments SET is_deleted = TRUE, delete_dt = CURRENT_TIMESTAMP WHERE id = ?",
 };
 
 export default SQL_ATTACHMENT_QUERIES;

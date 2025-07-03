@@ -81,7 +81,6 @@ export default function Post() {
       const data = {
         title: title,
         content: editor.getHTML(),
-        files: [],
       };
 
       if (isEditing) {
@@ -165,6 +164,7 @@ export default function Post() {
                   {
                     type: "link",
                     attrs: {
+                      
                       href: `${url}`,
                       target: "",
                       download: `${file.originalName}`,

@@ -47,7 +47,7 @@ export const createPost = async ({ title, author, content }) => {
         if (!imageList.includes(img.url)) {
           // 안 쓰이면
           // 로컬 파일 삭제
-          const filePath = path.join(__dirname, "../uploads", img.url);
+          const filePath = path.join(__dirname, "../../../", img.url);
           fs.unlink(filePath, (err) => {
             if (err) console.error(`${filePath} 삭제 실패했습니다. :`, err);
           });
@@ -66,13 +66,24 @@ export const createPost = async ({ title, author, content }) => {
         [author]
       );
 
-      const fileNames = fileList.map((e) => e.name);
+      const fileIds = fileList.map((e) => e.id);
+
+      console.log("파싱 파일");
+      console.log(fileList);
+
+      console.log("파싱 파일 아이디 모음");
+      console.log(fileIds);
+
+      console.log("임시 파일");
+      console.log(tempFiles);
 
       for (const file of tempFiles) {
-        if (!fileNames.includes(String(file.originalName))) {
+        if (!fileIds.includes(file.id)) {
+          console.log("삭제 파일");
+          console.log(file);
           // 안 쓰이면
           // 로컬 파일 삭제
-          const filePath = path.join(__dirname, file.url);
+          const filePath = path.join(__dirname, "../../../", file.url);
           fs.unlink(filePath, (err) => {
             if (err) console.error(`${filePath} 삭제 실패했습니다. :`, err);
           });
@@ -82,6 +93,8 @@ export const createPost = async ({ title, author, content }) => {
             file.id,
           ]);
         } else {
+          console.log("저장 파일");
+          console.log(file);
           // 쓰이면
           await tran.query(SQL_ATTACHMENT_QUERIES.SAVE_ATTACHMENT, [
             postId,
@@ -111,7 +124,7 @@ export const getPost = async (id) => {
   return row[0];
 };
 
-export const editPost = async ({ title, content, id, author }, files) => {
+export const editPost = async ({ title, content, id, author }) => {
   const tran = await pool.getConnection();
   await tran.beginTransaction();
 
@@ -127,7 +140,7 @@ export const editPost = async ({ title, content, id, author }, files) => {
         author,
       ]);
 
-      const list = extractContentData(content);
+      const { imageList, fileList } = extractContentData(content);
 
       // 기존 이미지 가져오기
       const [prevImages] = await tran.query(
@@ -135,12 +148,20 @@ export const editPost = async ({ title, content, id, author }, files) => {
         [id]
       );
 
+      console.log("기존 이미지");
+      console.log(prevImages);
+
+      console.log("파싱 이미지");
+      console.log(imageList);
+
       // 삭제된 이미지 처리
       for (const img of prevImages) {
-        if (!list.includes(img.url)) {
+        if (!imageList.includes(img.url)) {
+          console.log("삭제될 이미지");
+          console.log(img);
           // 안 쓰이면
           // 로컬 파일 삭제
-          const filePath = path.join(__dirname, "../uploads", img.url);
+          const filePath = path.join(__dirname, "../../../", img.url);
           fs.unlink(filePath, (err) => {
             if (err) console.error(`${filePath} 삭제 실패했습니다. :`, err);
           });
@@ -155,12 +176,17 @@ export const editPost = async ({ title, content, id, author }, files) => {
         author,
       ]);
 
+      console.log("임시 이미지");
+      console.log(tempImages);
+
       // 이미지 확인
       for (const img of tempImages) {
-        if (!list.includes(img.url)) {
+        if (!imageList.includes(img.url)) {
+          console.log("삭제 이미지");
+          console.log(img);
           // 안 쓰이면
           // 로컬 파일 삭제
-          const filePath = path.join(__dirname, "../uploads", img.url);
+          const filePath = path.join(__dirname, "../../../", img.url);
           fs.unlink(filePath, (err) => {
             if (err) console.error(`${filePath} 삭제 실패했습니다. :`, err);
           });
@@ -169,6 +195,8 @@ export const editPost = async ({ title, content, id, author }, files) => {
           await tran.query(SQL_IMAGE_QUERIES.DELETE_TEMP_IMAGE, [img.id]);
         } else {
           // 쓰이면
+          console.log("사용 이미지");
+          console.log(img);
 
           await tran.query(SQL_IMAGE_QUERIES.SAVE_IMAGE, [id, img.id]);
         }
@@ -180,12 +208,25 @@ export const editPost = async ({ title, content, id, author }, files) => {
         [id]
       );
 
+      console.log("파싱 파일");
+      console.log(fileList);
+
+      console.log("기존 파일");
+      console.log(prevFiles);
+
+      const fileIds = fileList.map((e) => e.id);
+
+      console.log("파일 아이디들");
+      console.log(fileIds);
+
       // 삭제된 파일 처리
       for (const file of prevFiles) {
-        if (!files.includes(String(file.id))) {
+        if (!fileIds.includes(file.id)) {
+          console.log("삭제 파일");
+          console.log(file);
           // 안 쓰이면
           // 로컬 파일 삭제
-          const filePath = path.join(__dirname, "../uploads", file.url);
+          const filePath = path.join(__dirname, "../../../", file.url);
           fs.unlink(filePath, (err) => {
             if (err) console.error(`${filePath} 삭제 실패했습니다. :`, err);
           });
@@ -203,12 +244,17 @@ export const editPost = async ({ title, content, id, author }, files) => {
         [author]
       );
 
+      console.log("임시 파일");
+      console.log(tempFiles);
+
       // 파일 추가
       for (const file of tempFiles) {
-        if (!files.includes(String(file.id))) {
+        if (!fileIds.includes(file.id)) {
+          console.log("삭제 파일");
+          console.log(file);
           // 안 쓰이면
           // 로컬 파일 삭제
-          const filePath = path.join(__dirname, "../uploads", file.url);
+          const filePath = path.join(__dirname, "../../../", file.url);
           fs.unlink(filePath, (err) => {
             if (err) console.error(`${filePath} 삭제 실패했습니다. :`, err);
           });
@@ -218,6 +264,8 @@ export const editPost = async ({ title, content, id, author }, files) => {
             file.id,
           ]);
         } else {
+          console.log("사용 파일");
+          console.log(file);
           // 쓰이면
           await tran.query(SQL_ATTACHMENT_QUERIES.SAVE_ATTACHMENT, [
             id,
@@ -228,7 +276,8 @@ export const editPost = async ({ title, content, id, author }, files) => {
 
       await tran.commit();
 
-      result = true;
+      result.flag = true;
+      result.files = fileList;
     } catch (err) {
       console.error(`Transaction error : ${err.message}`);
       await tran.rollback();
