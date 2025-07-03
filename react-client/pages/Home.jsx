@@ -8,6 +8,7 @@ import PostList from "../components/PostList.jsx";
 import Page from "../components/Page.jsx";
 import { checkUser } from "../utils/checkUser.js";
 import { useNavigation } from "../utils/navigate.js";
+import { useUser } from "../hooks/useUser.js";
 
 export default function Home() {
   const { goToPost, goToLogin } = useNavigation();
