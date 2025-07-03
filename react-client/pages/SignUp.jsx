@@ -1,8 +1,8 @@
 import { useState } from "react";
 import styles from "../css/signup.module.css";
-import { useNavigate } from "react-router-dom";
 import { ID_REG, NAME_REG, PW_REG } from "../utils/validation.js";
 import publicApi from "../utils/api/publicInstance.js";
+import { useNavigation } from "../utils/navigate.js";
 
 const infos = {
   id: "",
@@ -13,7 +13,7 @@ const infos = {
 
 export default function SignUp() {
   const [inputs, setInputs] = useState(infos);
-  const navigate = useNavigate();
+  const {goToLogin} = useNavigation();
 
   const onChange = (e) => {
     const { name, value } = e.target;
@@ -39,7 +39,7 @@ export default function SignUp() {
     try {
       const res = await publicApi.post("/auth/signup", inputs);
 
-      if (res) navigate("/login");
+      if (res) goToLogin();
     } catch (err) {
       console.log(err);
       alert(err.response.data.message);

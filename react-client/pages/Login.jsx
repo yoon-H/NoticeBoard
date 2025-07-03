@@ -1,10 +1,10 @@
-import { useNavigate } from "react-router-dom";
 import styles from "../css/login.module.css";
 import { useState } from "react";
 import { ID_REG, PW_REG } from "../utils/validation.js";
 import publicApi from "../utils/api/publicInstance.js";
 import { useUser } from "../hooks/useUser.js";
 import { checkUser } from "../utils/checkUser.js";
+import { useNavigation } from "../utils/navigate.js";
 
 const infos = {
   id: "",
@@ -13,7 +13,7 @@ const infos = {
 
 export default function Login() {
   const [inputs, setInputs] = useState(infos);
-  const navigate = useNavigate();
+  const { goHome, goToLogin } = useNavigation();
   const { setUser } = useUser();
 
   const onChange = (e) => {
@@ -41,10 +41,14 @@ export default function Login() {
       if (!dbUser) return;
       setUser(dbUser);
 
-      navigate("/");
+      goHome();
     } catch (err) {
       console.log(err);
       alert(err.response.data.message);
+
+      if (err.response?.status === 401) {
+        goToLogin();
+      }
     }
   };
 

@@ -1,16 +1,17 @@
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import privateApi from "../utils/api/privateInstance.js";
 import { useState } from "react";
 import Focus from "@tiptap/extension-focus";
 
 import EditorToolbar from "../components/EditorToolbar.jsx";
 import styles from "../css/post.module.css";
+import { useNavigation } from "../utils/navigate.js";
 
 export default function Post() {
-  const navigate = useNavigate();
+  const { goToDetail, goToLogin } = useNavigation();
   const params = useParams();
   let postId = params.id;
 
@@ -47,6 +48,11 @@ export default function Post() {
           editor?.commands.setContent(data.title);
         } catch (err) {
           console.log(err);
+
+          if (err.response?.status === 401) {
+            goToLogin();
+          }
+
           alert(err.response.data.message);
         }
       };
@@ -78,10 +84,14 @@ export default function Post() {
         if (res.data.id) postId = res.data.id;
       }
 
-      navigate(`/detail/${postId}`);
+      goToDetail(postId);
     } catch (err) {
       console.log(err);
       alert(err.response.data.message);
+
+      if (err.response?.status === 401) {
+        goToLogin();
+      }
     }
   };
 

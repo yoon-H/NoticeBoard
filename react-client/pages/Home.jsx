@@ -1,4 +1,4 @@
-import { Link, NavLink, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import privateApi from "../utils/api/privateInstance.js";
 import publicApi from "../utils/api/publicInstance.js";
@@ -7,9 +7,10 @@ import styles from "../css/home.module.css";
 import PostList from "../components/PostList.jsx";
 import Page from "../components/Page.jsx";
 import { checkUser } from "../utils/checkUser.js";
-import { navigate } from "../utils/navigate.js";
+import { useNavigation } from "../utils/navigate.js";
 
 export default function Home() {
+  const { goToPost, goToLogin } = useNavigation();
   const [postDatas, setPostDatas] = useState([]);
   const [activePage, setActivePage] = useState(1);
   const [searchParams] = useSearchParams();
@@ -39,11 +40,17 @@ export default function Home() {
   }
 
   const handleWriteBtn = async () => {
-    const data = await checkUser();
+    try {
+      const data = await checkUser();
 
-    if (!data || !data.user || !data.user.id) return;
+      if (!data || !data.user || !data.user.id) return;
 
-    navigate("/post");
+      goToPost();
+    } catch (err) {
+      if (err.response?.status === 401) {
+        goToLogin();
+      }
+    }
   };
 
   return (
