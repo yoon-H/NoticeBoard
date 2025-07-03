@@ -1,13 +1,8 @@
-import { useNavigate } from "react-router-dom";
-
 import styles from "../css/home.module.css";
+import { useNavigation } from "../utils/navigate.js";
 
 export default function Page({ totalPages, currentPage }) {
-  const navigate = useNavigate();
-
-  const goToPage = (page) => {
-    navigate(`?page=${page}`);
-  };
+  const {goToPage} = useNavigation();
 
   // 페이지 번호 모음
   const getPagination = (current, total, delta = 1) => {

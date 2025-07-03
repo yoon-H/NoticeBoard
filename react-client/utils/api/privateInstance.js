@@ -1,5 +1,4 @@
 import axios from "axios";
-import { navigate } from "../navigate.js";
 import { BASE_URL } from "./constants.js";
 import { getNewAccessToken } from "./auth.js";
 
@@ -23,9 +22,6 @@ privateInstance.interceptors.response.use(
         return privateInstance(originalRequest);
       } catch (err) {
         console.log("토큰 재발급 실패");
-        console.log(err);
-
-        navigate("/login");
       } finally {
         isRefreshing = false;
       }
