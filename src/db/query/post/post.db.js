@@ -68,19 +68,8 @@ export const createPost = async ({ title, author, content }) => {
 
       const fileIds = fileList.map((e) => e.id);
 
-      console.log("파싱 파일");
-      console.log(fileList);
-
-      console.log("파싱 파일 아이디 모음");
-      console.log(fileIds);
-
-      console.log("임시 파일");
-      console.log(tempFiles);
-
       for (const file of tempFiles) {
         if (!fileIds.includes(file.id)) {
-          console.log("삭제 파일");
-          console.log(file);
           // 안 쓰이면
           // 로컬 파일 삭제
           const filePath = path.join(__dirname, "../../../", file.url);
@@ -93,8 +82,6 @@ export const createPost = async ({ title, author, content }) => {
             file.id,
           ]);
         } else {
-          console.log("저장 파일");
-          console.log(file);
           // 쓰이면
           await tran.query(SQL_ATTACHMENT_QUERIES.SAVE_ATTACHMENT, [
             postId,
@@ -148,17 +135,9 @@ export const editPost = async ({ title, content, id, author }) => {
         [id]
       );
 
-      console.log("기존 이미지");
-      console.log(prevImages);
-
-      console.log("파싱 이미지");
-      console.log(imageList);
-
       // 삭제된 이미지 처리
       for (const img of prevImages) {
         if (!imageList.includes(img.url)) {
-          console.log("삭제될 이미지");
-          console.log(img);
           // 안 쓰이면
           // 로컬 파일 삭제
           const filePath = path.join(__dirname, "../../../", img.url);
@@ -176,14 +155,9 @@ export const editPost = async ({ title, content, id, author }) => {
         author,
       ]);
 
-      console.log("임시 이미지");
-      console.log(tempImages);
-
       // 이미지 확인
       for (const img of tempImages) {
         if (!imageList.includes(img.url)) {
-          console.log("삭제 이미지");
-          console.log(img);
           // 안 쓰이면
           // 로컬 파일 삭제
           const filePath = path.join(__dirname, "../../../", img.url);
@@ -195,8 +169,6 @@ export const editPost = async ({ title, content, id, author }) => {
           await tran.query(SQL_IMAGE_QUERIES.DELETE_TEMP_IMAGE, [img.id]);
         } else {
           // 쓰이면
-          console.log("사용 이미지");
-          console.log(img);
 
           await tran.query(SQL_IMAGE_QUERIES.SAVE_IMAGE, [id, img.id]);
         }
@@ -208,22 +180,11 @@ export const editPost = async ({ title, content, id, author }) => {
         [id]
       );
 
-      console.log("파싱 파일");
-      console.log(fileList);
-
-      console.log("기존 파일");
-      console.log(prevFiles);
-
       const fileIds = fileList.map((e) => e.id);
-
-      console.log("파일 아이디들");
-      console.log(fileIds);
 
       // 삭제된 파일 처리
       for (const file of prevFiles) {
         if (!fileIds.includes(file.id)) {
-          console.log("삭제 파일");
-          console.log(file);
           // 안 쓰이면
           // 로컬 파일 삭제
           const filePath = path.join(__dirname, "../../../", file.url);
@@ -244,14 +205,9 @@ export const editPost = async ({ title, content, id, author }) => {
         [author]
       );
 
-      console.log("임시 파일");
-      console.log(tempFiles);
-
       // 파일 추가
       for (const file of tempFiles) {
         if (!fileIds.includes(file.id)) {
-          console.log("삭제 파일");
-          console.log(file);
           // 안 쓰이면
           // 로컬 파일 삭제
           const filePath = path.join(__dirname, "../../../", file.url);
@@ -264,8 +220,6 @@ export const editPost = async ({ title, content, id, author }) => {
             file.id,
           ]);
         } else {
-          console.log("사용 파일");
-          console.log(file);
           // 쓰이면
           await tran.query(SQL_ATTACHMENT_QUERIES.SAVE_ATTACHMENT, [
             id,
