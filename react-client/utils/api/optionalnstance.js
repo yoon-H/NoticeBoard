@@ -1,5 +1,6 @@
 import axios from "axios";
 import { BASE_URL } from "./constants.js";
+import { getNewAccessToken } from "./auth.js";
 
 const optionalInstance = axios.create({
   baseURL: BASE_URL,
@@ -21,6 +22,7 @@ optionalInstance.interceptors.response.use(
         return optionalInstance(originalRequest);
       } catch (err) {
         console.log("토큰 재발급 실패");
+        console.log(err);
       } finally {
         isRefreshing = false;
       }

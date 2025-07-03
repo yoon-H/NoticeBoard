@@ -5,7 +5,19 @@ import {
 } from "../middlewares/multer.middleware.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
 import { saveTempImage } from "../db/query/image/image.db.js";
-import { saveTempAttachment, softDeleteAttachment } from "../db/query/attachment/attachment.db.js";
+import {
+  getAttachmentById,
+  saveTempAttachment,
+  softDeleteAttachment,
+} from "../db/query/attachment/attachment.db.js";
+
+import path from "path";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+import fs from "fs";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const router = Router();
 
@@ -106,5 +118,25 @@ router.delete(
     }
   }
 );
+
+router.get("/download/:fileId", async (req, res, next) => {
+  const fileId = req.params.fileId;
+
+  const file = await getAttachmentById(fileId);
+
+  const filePath = path.join(__dirname, "../", file.url);
+
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).send("파일이 존재하지 않습니다.");
+  }
+
+  res.setHeader(
+    "Content-Disposition",
+    `attachment; filename*=UTF-8''${encodeURIComponent(file.originalName)}`
+  );
+  res.setHeader("Content-Type", "application/octet-stream");
+
+  fs.createReadStream(filePath).pipe(res);
+});
 
 export default router;

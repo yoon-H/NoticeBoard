@@ -9,3 +9,5 @@ node_modules/
 dist/
 
 public/uploads/
+
+src/uploads/

@@ -1,14 +1,17 @@
-import { EditorContent, useEditor } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import Image from "@tiptap/extension-image";
 import { useParams } from "react-router-dom";
 import privateApi from "../utils/api/privateInstance.js";
-import { useState } from "react";
-import Focus from "@tiptap/extension-focus";
+import { useEffect, useState } from "react";
+import { useNavigation } from "../utils/navigate.js";
 
 import EditorToolbar from "../components/EditorToolbar.jsx";
 import styles from "../css/post.module.css";
-import { useNavigation } from "../utils/navigate.js";
+import { SERVER_URL } from "../utils/api/constants.js";
+
+import { EditorContent, useEditor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Image from "@tiptap/extension-image";
+import Focus from "@tiptap/extension-focus";
+import { CustomLink } from "../utils/customLink.js";
 
 export default function Post() {
   const { goToDetail, goToLogin } = useNavigation();
@@ -19,47 +22,57 @@ export default function Post() {
 
   const [title, setTitle] = useState("");
 
-  // title input 변경
-  const onChange = (e) => {
-    setTitle(e.target.value);
-  };
-
   const editor = useEditor({
     extensions: [
       StarterKit,
-      Image,
+      Image.configure({
+        inline: true,
+        allowBase64: true,
+      }),
       Focus.configure({
         className: "has-focus",
         mode: "shallowest",
+      }),
+      CustomLink.configure({
+        autolink: false,
+        linkOnPaste: false,
       }),
     ],
   });
 
   // 1. 수정이면 본문 받아오기
-  if (isEditing) {
-    useEffect(() => {
-      const getPost = async () => {
-        try {
-          const res = await privateApi.get(`/posts/${postId}`);
+  useEffect(() => {
+    if (!isEditing) return;
 
-          const data = res.data;
+    const getPost = async () => {
+      try {
+        const res = await privateApi.get(`/posts/${postId}`);
 
-          setTitle(data.title);
-          editor?.commands.setContent(data.title);
-        } catch (err) {
-          console.log(err);
+        const data = res.data;
 
-          if (err.response?.status === 401) {
-            goToLogin();
-          }
+        if (!data || !data.post) return;
 
-          alert(err.response.data.message);
+        const post = data.post;
+
+        setTitle(post.title);
+        editor?.commands.setContent(post.content);
+      } catch (err) {
+        console.log(err);
+        alert(err.response.data.message);
+
+        if (err.response?.status === 401) {
+          goToLogin();
         }
-      };
+      }
+    };
 
-      getPost();
-    });
-  }
+    getPost();
+  }, [editor]);
+
+  // title input 변경
+  const onChange = (e) => {
+    setTitle(e.target.value);
+  };
 
   // 2. 툴바 만들기
   // 2-1. 이미지 본문 삽입 (후순위)
@@ -72,12 +85,11 @@ export default function Post() {
     try {
       const data = {
         title: title,
-        content: editor.getText(),
-        files: [],
+        content: editor.getHTML(),
       };
 
       if (isEditing) {
-        await privateApi.put(data);
+        await privateApi.put(`/posts/${postId}`, data);
       } else {
         const res = await privateApi.post(`/posts`, data);
 
@@ -95,6 +107,88 @@ export default function Post() {
     }
   };
 
+  // 이미지 추가
+  const addImage = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.click();
+
+    input.onchange = async () => {
+      // 파일을 선택했을 때
+      const file = input.files[0];
+      if (!file) return;
+      const formData = new FormData(); // 이미지 파일로 보내기 위해 서버에 보낼 객체 생성
+      formData.append("image", file); // 파일 담기
+
+      try {
+        const res = await privateApi.post(`/upload/image`, formData);
+
+        if (!res || !res.data || !res.data.imageUrl) return;
+
+        const url = SERVER_URL + res.data.imageUrl;
+
+        editor.chain().focus().setImage({ src: url }).run();
+      } catch (err) {
+        console.log(err);
+      }
+    };
+  };
+
+  // 파일 추가
+  const addFile = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.multiple = true;
+    input.accept = "*/*";
+    input.click();
+
+    input.onchange = async () => {
+      // 파일을 선택했을 때
+      const files = input.files;
+      if (!files || files.length === 0) return;
+
+      const formData = new FormData(); // 이미지 파일로 보내기 위해 서버에 보낼 객체 생성
+      for (const file of files) {
+        formData.append("attachment", file);
+      }
+
+      try {
+        const res = await privateApi.post(`/upload/attachment`, formData);
+
+        if (!res || !res.data || !res.data.files) return;
+
+        const uploadFiles = res.data.files;
+
+        for (const file of uploadFiles) {
+          const url = SERVER_URL + `/api/download/${file.id}`;
+
+          editor.commands.insertContent({
+            type: "paragraph",
+            content: [
+              {
+                type: "text",
+                text: `${file.originalName}`,
+                marks: [
+                  {
+                    type: "link",
+                    attrs: {
+                      href: `${url}`,
+                      target: "",
+                      download: `${file.originalName}`,
+                    },
+                  },
+                ],
+              },
+            ],
+          });
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
+  };
+
   return (
     <>
       <div className={styles["post-container"]}>
@@ -104,14 +198,18 @@ export default function Post() {
             name="title"
             className={styles["title"]}
             placeholder="제목"
-            value={title}
+            value={title ?? ""}
             onChange={onChange}
           />
         </div>
         <div className={styles["post-files"]}>
           <input type="file" className={styles["attachment-header"]} multiple />
         </div>
-        <EditorToolbar editor={editor}></EditorToolbar>
+        <EditorToolbar
+          editor={editor}
+          addImage={addImage}
+          addFile={addFile}
+        ></EditorToolbar>
         <EditorContent
           className={styles["tiptap"]}
           editor={editor}

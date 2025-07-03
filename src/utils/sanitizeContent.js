@@ -4,7 +4,7 @@ export const sanitizePost = (content) => {
   const result = sanitize(content, {
     allowedTags: ["h1", "h2", "p", "b", "i", "u", "a", "img"],
     allowedAttributes: {
-      a: ["href"],
+      a: ["href", "download"],
       img: ["src", "alt"],
     },
   });
