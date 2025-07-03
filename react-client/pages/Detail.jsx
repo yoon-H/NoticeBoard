@@ -5,7 +5,7 @@ import getEffectiveDate from "../utils/getEffectiveDate.js";
 import publicApi from "../utils/api/publicInstance.js";
 import Page from "../components/Page.jsx";
 import { useUser } from "../hooks/useUser.js";
-import { navigate } from "../utils/navigate.js";
+import { useNavigation } from "../utils/navigate.js";
 import { checkUser } from "../utils/checkUser.js";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -26,6 +26,8 @@ const infos = {
 export default function Detail() {
   const params = useParams();
   const postId = params.id;
+
+  const { goHome, goToPost } = useNavigation();
 
   const [postInfo, setPostInfo] = useState(infos);
   const [groups, setGroups] = useState([]);
@@ -129,7 +131,7 @@ export default function Detail() {
       return;
     }
 
-    navigate(`/post/${postId}`);
+    goToPost(postId);
   };
 
   const deletePost = async () => {
@@ -146,7 +148,7 @@ export default function Detail() {
 
     const res = await privateApi.delete(`/posts/${postId}`);
 
-    if (res) navigate("/");
+    if (res) goHome();
   };
 
   const submitComment = async () => {
