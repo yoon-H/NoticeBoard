@@ -202,9 +202,6 @@ export default function Post() {
             onChange={onChange}
           />
         </div>
-        <div className={styles["post-files"]}>
-          <input type="file" className={styles["attachment-header"]} multiple />
-        </div>
         <EditorToolbar
           editor={editor}
           addImage={addImage}
