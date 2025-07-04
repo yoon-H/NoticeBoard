@@ -1,8 +1,8 @@
 import styles from "../css/home.module.css";
-import { useNavigation } from "../utils/navigate.js";
+import { useNavigation } from "../hooks/useNavigation.js";
 
 export default function Page({ totalPages, currentPage }) {
-  const {goToPage} = useNavigation();
+  const { goToPage } = useNavigation();
 
   // 페이지 번호 모음
   const getPagination = (current, total, delta = 1) => {

@@ -5,7 +5,7 @@ import getEffectiveDate from "../utils/getEffectiveDate.js";
 import publicApi from "../utils/api/publicInstance.js";
 import Page from "../components/Page.jsx";
 import { useUser } from "../hooks/useUser.js";
-import { useNavigation } from "../utils/navigate.js";
+import { useNavigation } from "../hooks/useNavigation.js";
 import { checkUser } from "../utils/checkUser.js";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";

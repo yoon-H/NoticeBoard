@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import privateApi from "../utils/api/privateInstance.js";
 import { useEffect, useState } from "react";
-import { useNavigation } from "../utils/navigate.js";
+import { useNavigation } from "../hooks/useNavigation.js";
 
 import EditorToolbar from "../components/EditorToolbar.jsx";
 import styles from "../css/post.module.css";
