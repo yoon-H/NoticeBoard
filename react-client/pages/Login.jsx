@@ -4,7 +4,7 @@ import { ID_REG, PW_REG } from "../utils/validation.js";
 import publicApi from "../utils/api/publicInstance.js";
 import { useUser } from "../hooks/useUser.js";
 import { checkUser } from "../utils/checkUser.js";
-import { useNavigation } from "../utils/navigate.js";
+import { useNavigation } from "../hooks/useNavigation.js";
 
 const infos = {
   id: "",

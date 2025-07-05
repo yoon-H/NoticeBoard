@@ -2,7 +2,7 @@ import { useState } from "react";
 import styles from "../css/signup.module.css";
 import { ID_REG, NAME_REG, PW_REG } from "../utils/validation.js";
 import publicApi from "../utils/api/publicInstance.js";
-import { useNavigation } from "../utils/navigate.js";
+import { useNavigation } from "../hooks/useNavigation.js";
 
 const infos = {
   id: "",
@@ -13,7 +13,7 @@ const infos = {
 
 export default function SignUp() {
   const [inputs, setInputs] = useState(infos);
-  const {goToLogin} = useNavigation();
+  const { goToLogin } = useNavigation();
 
   const onChange = (e) => {
     const { name, value } = e.target;

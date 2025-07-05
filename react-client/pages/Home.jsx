@@ -7,7 +7,7 @@ import styles from "../css/home.module.css";
 import PostList from "../components/PostList.jsx";
 import Page from "../components/Page.jsx";
 import { checkUser } from "../utils/checkUser.js";
-import { useNavigation } from "../utils/navigate.js";
+import { useNavigation } from "../hooks/useNavigation.js";
 import { useUser } from "../hooks/useUser.js";
 
 export default function Home() {
