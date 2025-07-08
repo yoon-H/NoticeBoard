@@ -4,10 +4,13 @@ package-lock.json
 
 node_modules/
 
-*.xlsx
+.xlsx
 
 dist/
 
-public/uploads/
+public/uploads
 
 src/uploads/
+
+DS_Store
+.DS_Store
